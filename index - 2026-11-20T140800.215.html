@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1B2A4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nilo WMS">
+<title>Nilo WMS · Endereçamento</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231B2A4A'/%3E%3Crect x='12' y='14' width='16' height='36' fill='%23FFC400'/%3E%3Crect x='36' y='14' width='16' height='16' fill='%23FFC400'/%3E%3Crect x='36' y='34' width='16' height='16' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{--y:#FFC400;--y2:#E6A100;--n:#1B2A4A;--g:#333;--bg:#F7F7F5;--line:#DDE1EA;--soft:#EEF1F7;--ok:#1E9E5A;--warn:#F28C1B;--bad:#C0392B;--blue:#CFE3F6;--r:12px;--sh:0 1px 2px rgba(27,42,74,.08),0 4px 14px rgba(27,42,74,.06)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;max-width:100%;overflow-x:hidden}
+.body,main#view{min-width:0}
+body{font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--g);background:var(--bg);overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:-.2px}
+/* layout */
+#app{display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr;min-height:100%}
+header.top{position:sticky;top:0;z-index:30;background:#E6EEF8;color:var(--n);padding:calc(env(safe-area-inset-top) + 8px) 14px 8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:3px solid var(--y)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.brand i{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--y);color:var(--n);font-style:normal;font-weight:800}
+.brand small{display:block;font-weight:500;font-size:10.5px;opacity:.75;letter-spacing:.4px;text-transform:uppercase}
+.lj{display:flex!important;align-items:center;gap:6px;margin-top:2px;opacity:1!important;text-transform:none!important;letter-spacing:0!important}
+.lj select{border:0;border-radius:7px;background:rgba(27,42,74,.1);color:var(--n);font-size:12.5px;font-weight:700;padding:3px 4px;max-width:150px;outline:0}
+.sdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#9aa3b5;flex:none}
+.sdot.ok{background:#2e9e5b}.sdot.pend,.sdot.busy,.sdot.pause{background:#E6A100}.sdot.err{background:#c0392b}
+.seg{display:inline-flex;background:rgba(27,42,74,.08);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--n);padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px}
+.seg button.on{background:var(--y);color:var(--n)}
+.seg.light{background:var(--soft)}
+.seg.light button{color:var(--n)}
+.seg.light button.on{background:var(--n);color:var(--y)}
+.search{position:relative;flex:1;min-width:150px;max-width:460px}
+.search input{width:100%;border:0;border-radius:10px;padding:9px 12px 9px 36px;background:#fff;color:var(--g);outline:0}
+.search input::placeholder{color:#7a8298}
+.search input:focus{background:#fff;color:var(--g)}
+.search .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:17px;height:17px;opacity:.8;pointer-events:none}
+#sres{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;color:var(--g);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);max-height:60vh;overflow:auto;display:none;z-index:50}
+#sres.on{display:block}
+#sres .sh{padding:6px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#7a8298;background:var(--soft)}
+#sres button{display:flex;width:100%;text-align:left;gap:10px;align-items:center;border:0;background:#fff;padding:9px 12px;border-bottom:1px solid var(--line)}
+#sres button:hover{background:#fff8dc}
+.hbtn{border:0;background:rgba(27,42,74,.08);color:var(--n);width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
+.body{display:grid;grid-template-columns:1fr;min-height:0}
+aside.side{display:none}
+main#view{padding:14px 14px calc(86px + env(safe-area-inset-bottom));max-width:1400px;width:100%;margin:0 auto}
+nav.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
+nav.bar button{border:0;background:#fff;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;font-size:10.5px;font-weight:600;color:#6b748a}
+nav.bar button.on{color:var(--n);box-shadow:inset 0 3px 0 var(--y)}
+@media(max-width:899px){.search{order:5;flex:1 1 100%;max-width:none}.hbtn{margin-left:auto}}
+@media(min-width:900px){
+  .body{grid-template-columns:224px 1fr}
+  aside.side{display:block;background:#fff;border-right:1px solid var(--line);padding:14px 10px;position:sticky;top:60px;height:calc(100vh - 60px)}
+  aside.side button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:transparent;padding:10px 12px;border-radius:10px;font-weight:600;color:#4a5370;margin-bottom:2px}
+  aside.side button:hover{background:var(--soft)}
+  aside.side button.on{background:var(--n);color:#fff}
+  aside.side button.on .ic{color:var(--y)}
+  aside.side .ver{position:absolute;bottom:14px;left:16px;font-size:11px;color:#8a92a8}
+  nav.bar{display:none}
+  main#view{padding:22px 26px 40px}
+}
+/* planta */
+.pl{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:6px}
+.pl svg{display:block;min-width:720px;width:100%;height:auto;font-family:inherit}
+.pl .rr{cursor:pointer}
+/* componentes */
+h1.pt{font-size:20px;margin:2px 0 2px;color:var(--n)}
+.sub{color:#68718a;margin:0 0 14px;font-size:13px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:14px}
+.card h3{margin:0 0 10px;font-size:14px;color:var(--n);display:flex;align-items:center;gap:8px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(2,1fr)}
+@media(min-width:700px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1100px){.kpis{grid-template-columns:repeat(6,1fr)}}
+.kpi{background:#E6EEF8;color:var(--n);border-radius:var(--r);padding:12px 14px;border-left:5px solid var(--y)}
+.kpi b{display:block;font-size:24px;line-height:1.1;color:var(--n)}
+.kpi span{font-size:12px;opacity:.85}
+.two{grid-template-columns:1fr}
+@media(min-width:1000px){.two{grid-template-columns:1.15fr 1fr}}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:700;background:var(--soft);color:var(--n);white-space:nowrap}
+.chip.ok{background:#DDF3E8;color:#0F7A43}.chip.warn{background:#FFE7C7;color:#9A5200}.chip.bad{background:#FADBD8;color:#9B2C20}.chip.y{background:#FFF0B3;color:#6b5000}.chip.n{background:var(--n);color:var(--y)}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-weight:700;color:var(--n);display:inline-flex;align-items:center;gap:7px}
+.btn:hover{background:var(--soft)}
+.btn.p{background:var(--y);border-color:var(--y2);color:var(--n)}
+.btn.p:hover{background:var(--y2)}
+.btn.d{background:var(--n);color:#fff;border-color:var(--n)}
+.btn.r{background:#fff;color:var(--bad);border-color:#efc2bd}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.sp{justify-content:space-between}
+label.f{display:block;font-size:12px;font-weight:700;color:#59627a;margin:0 0 4px;text-transform:uppercase;letter-spacing:.4px}
+.in{width:100%;border:1px solid #cfd5e2;border-radius:10px;padding:10px 12px;background:#fff;outline:0;min-height:42px}
+.in:focus{border-color:var(--y2);box-shadow:0 0 0 3px rgba(255,196,0,.28)}
+.fg{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:640px){.fg.c2{grid-template-columns:1fr 1fr}.fg.c3{grid-template-columns:repeat(3,1fr)}.fg.c4{grid-template-columns:repeat(4,1fr)}}
+.err{color:var(--bad);font-size:12.5px;margin-top:4px}
+.hint{color:#7a8298;font-size:12.5px}
+table.t{width:100%;border-collapse:collapse;font-size:13px}
+table.t th{background:var(--n);color:#fff;text-align:left;padding:8px 10px;font-size:12px;position:sticky;top:0;white-space:nowrap}
+table.t td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t tr:hover td{background:#fffbea}
+@media screen and (max-width:699px){
+  .tw{border:0;background:transparent;max-height:none;overflow:visible}
+  table.t,table.t tbody{display:block;width:100%}
+  table.t tr.hd{display:none}
+  table.t tr{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;box-shadow:var(--sh)}
+  table.t td{display:block;overflow:hidden;padding:4px 0;border:0;text-align:right!important;word-break:break-word;line-height:1.35}
+  table.t td::before{content:attr(data-l);float:left;margin-right:12px;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#7a8298;padding-top:2px}
+  table.t td[data-l=""]::before,table.t td[data-l="#"]::before{display:none}
+  table.t td[data-l="#"]{float:right;padding:0;margin:0 0 0 8px}
+  table.t td.em{display:none}
+  table.t tr:hover td{background:transparent}
+}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:#fff;max-height:70vh}
+.li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);background:#fff;width:100%;text-align:left;border-left:0;border-right:0;border-top:0}
+button.li:hover{background:#fffbea}
+.list{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff}
+.list>.li:last-child{border-bottom:0}
+.bar-o{height:9px;border-radius:9px;background:var(--soft);overflow:hidden}
+.bar-o i{display:block;height:100%;background:linear-gradient(90deg,var(--y),var(--y2))}
+.empty{text-align:center;padding:30px 14px;color:#7a8298}
+.banner{background:#FFF6D6;border:1px solid #f0d37a;border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+/* mapa */
+.chips{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700;color:var(--n);white-space:nowrap}
+.chips button.on{background:var(--n);color:var(--y);border-color:var(--n)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;margin:8px 0 12px;color:#59627a}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px;border:1px solid rgba(0,0,0,.18)}
+.face{margin-bottom:16px}
+.face h4{margin:0 0 6px;font-size:13px;color:var(--n);display:flex;gap:8px;align-items:center}
+.fscroll{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:10px}
+.fgrid{display:grid;gap:2px;align-items:stretch;min-width:max-content}
+.fgrid .h{font-size:11px;font-weight:700;color:var(--n);text-align:center;padding:2px 0 3px;grid-column:span 2;border-bottom:3px solid #C9CDD6;border-radius:2px}
+.fgrid .l{font-size:11px;font-weight:800;color:#59627a;display:grid;place-items:center}
+.ap{border:1px solid rgba(27,42,74,.25);border-radius:4px;height:28px;min-width:24px;padding:0;position:relative;font-size:10px;font-weight:800;color:var(--n);background:#E4E7EE}
+.ap.s-ocupado{background:var(--y)}
+.ap.s-avencer{background:var(--warn);color:#fff}
+.ap.s-vencido{background:var(--bad);color:#fff}
+.ap.s-vazio{background:#E4E7EE}
+.ap:hover{outline:2px solid var(--n);z-index:2}
+.ap.sel{outline:3px solid var(--n);z-index:3}
+.ap.dim{opacity:.25}
+.cor{background:repeating-linear-gradient(45deg,#FFF0B3,#FFF0B3 5px,#fff 5px,#fff 10px);border:1px dashed var(--n);border-radius:4px;display:grid;place-items:center;min-width:20px}
+.cor span{writing-mode:vertical-rl;font-size:10px;font-weight:800;color:var(--n);letter-spacing:1px}
+.base{background:var(--blue);border:1px solid rgba(27,42,74,.25);border-radius:4px;font-size:11px;font-weight:700;color:var(--n);text-align:center;padding:5px;grid-column:2/-1}
+.nolvl{background:transparent}
+/* drawer */
+.ov{position:fixed;inset:0;background:rgba(15,24,45,.5);z-index:80;display:none}
+.ov.on{display:block}
+.dr{position:absolute;background:#fff;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.3)}
+@media(max-width:899px){.dr{left:0;right:0;bottom:0;max-height:90vh;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom)}}
+@media(min-width:900px){.dr{top:0;right:0;bottom:0;width:480px}}
+.dr .dh{padding:16px 18px;background:var(--n);color:#fff;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.dr .dh .code{font-size:24px;font-weight:800;color:var(--y)}
+.dr .db{padding:16px 18px;overflow:auto;flex:1}
+.dr .x{border:0;background:rgba(255,255,255,.15);color:#fff;width:34px;height:34px;border-radius:9px;font-size:20px}
+.ln{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.ln .nm{font-weight:700;color:var(--n)}
+.ln .mt{font-size:12.5px;color:#68718a;display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.ln .ac{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.rad{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;background:#fff}
+.rad:has(input:checked){border-color:var(--y2);background:#fff8dc;box-shadow:0 0 0 2px rgba(255,196,0,.35)}
+.rad input{margin-top:3px;accent-color:var(--n)}
+.sug{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:4px}
+.sug button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:#fff;padding:9px 12px}
+.sug button:hover{background:#fff8dc}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));z-index:120;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+@media(min-width:900px){#toast{bottom:28px}}
+.tt{background:var(--n);color:#fff;border-left:5px solid var(--y);padding:10px 16px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.3);max-width:90vw;font-weight:600}
+.tt.bad{border-left-color:#ff6b5b}.tt.ok{border-left-color:#4fd18b}
+.mod{position:fixed;inset:0;z-index:100;background:rgba(15,24,45,.55);display:none;place-items:center;padding:14px}
+.mod.on{display:grid}
+.mod .mb{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow:auto;padding:18px}
+.mod h3{margin:0 0 12px;color:var(--n)}
+pre.code{background:#0f1a33;color:#d6e2ff;padding:12px;border-radius:10px;overflow:auto;font-size:12px;max-height:240px}
+/* etiquetas */
+#print-area{display:none}
+.labs{display:grid;gap:8px;grid-template-columns:repeat(var(--cols,2),1fr)}
+.lab{border:1.5px solid var(--n);border-radius:6px;padding:7px 9px;background:#fff;break-inside:avoid;page-break-inside:avoid}
+.lab .lh{display:flex;justify-content:space-between;font-size:9px;font-weight:700;color:var(--n);border-bottom:2px solid var(--y);padding-bottom:3px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.lab .lc{font-size:21px;font-weight:800;color:var(--n);text-align:center;background:var(--y);border-radius:4px;padding:2px 0;font-family:ui-monospace,Menlo,Consolas,monospace}
+.lab .lbar{height:34px;margin:6px 4px 3px}
+.lab .lbar svg{width:100%;height:100%;display:block;fill:#000}
+.lab .lm{display:flex;justify-content:space-between;font-size:9.5px;font-weight:700;color:#444}
+.cols3 .lab .lc{font-size:16px}
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff}
+  header.top,aside.side,nav.bar,.no-print,#toast,.ov,.mod{display:none!important}
+  main#view{padding:0;max-width:none}
+  .card,.tw,.list{box-shadow:none}
+  .tw{max-height:none;overflow:visible}
+  table.t th{position:static;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.pl main#view{display:none}
+  body.pl #print-area{display:block}
+  .lab .lc,.chip,.kpi,table.t th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand"><i>N</i><div>Nilo WMS<small class="lj"><select id="lojaSel" aria-label="Loja"></select><span id="sdot" class="sdot off" title="Nuvem não configurada"></span></small></div></div>
+    <div class="seg" id="siteSeg"></div>
+    <div class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg><input id="gs" type="search" autocomplete="off" placeholder="Buscar endereço ou produto…"><div id="sres"></div></div>
+    <button class="hbtn" data-act="tab" data-t="cfg" title="Configurações" aria-label="Configurações"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
+  </header>
+  <div class="body">
+    <aside class="side" id="side"></aside>
+    <main id="view"></main>
+  </div>
+  <nav class="bar" id="bar"></nav>
+</div>
+<div class="ov" id="ov"><div class="dr" id="dr"></div></div>
+<div class="mod" id="mod"><div class="mb" id="mb"></div></div>
+<div id="toast"></div>
+<div id="print-area"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   NILO WMS · ENDEREÇAMENTO  —  app único, offline, sem dependências
+   Estrutura dos endereços conforme o documento "Endereçamento · Depósito e Loja"
+   Código: RUA-PRÉDIO-NÍVEL-APTO  (ex.: 03-012-2-01)
+   ===================================================================== */
+const SELFTEST = location.hash === '#selftest';
+const KEY = SELFTEST ? 'nilo-wms-test' : 'nilo-wms-enderecamento-v1';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = (n, l) => String(n).padStart(l, '0');
+const fmtN = n => Number(n || 0).toLocaleString('pt-BR');
+const fmtD = d => d ? d.split('-').reverse().join('/') : '—';
+const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+const daysTo = v => Math.round((new Date(v + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 864e5);
+const nowIso = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 19);
+const fmtTs = t => t ? t.slice(8, 10) + '/' + t.slice(5, 7) + '/' + t.slice(0, 4) + ' ' + t.slice(11, 16) : '';
+const seq = (a, b, s = 1) => { const r = []; for (let i = a; i <= b; i += s) r.push(i); return r; };
+const SITES = { DEP: 'Depósito', LOJ: 'Loja' };
+/* Lojas da Rede Nilo. Só o Shopping BG tem planta cadastrada; as demais serão alimentadas depois, no mesmo padrão. */
+const LOJAS = [{ id: 'SHO', nome: 'Shopping BG' }, { id: 'MAT', nome: 'Matriz' }, { id: 'NXV', nome: 'Nova Xavantina' }, { id: 'QUE', nome: 'Querência' }, { id: 'AGB', nome: 'Água Boa' }, { id: 'JUS', nome: 'Jussara' }, { id: 'CAN', nome: 'Canarana' }];
+const LOJA_NOME = id => (LOJAS.find(l => l.id === id) || {}).nome || id;
+
+/* ---------------- estrutura física ---------------- */
+function buildStruct(site, loja) {
+  const ruas = [];
+  if (loja && loja !== 'SHO') return ruas; /* planta da loja ainda não cadastrada */
+  const F = (face, preds, nv, ap, tag, base) => ({ face, tag: tag || '', base: !!base, preds: preds.map(p => ({ p, n: typeof nv === 'function' ? nv(p) : nv, ap: typeof ap === 'function' ? ap(p) : 2 })) });
+  if (site === 'DEP') {
+    ruas.push({ rua: 1, faces: [F('única', seq(1, 11), 5)] });
+    ruas.push({ rua: 2, faces: [F('esq.', seq(1, 21, 2), 5), F('dir.', seq(2, 22, 2), 5)] });
+    ruas.push({ rua: 3, faces: [F('esq.', seq(1, 21, 2), 5), F('dir.', seq(2, 22, 2), 5)] });
+    ruas.push({ rua: 4, faces: [F('esq.', seq(1, 21, 2), 5), F('dir.', seq(2, 14, 2), 5)] });
+    ruas.push({ rua: 5, faces: [F('esq.', seq(1, 19, 2), 5), F('dir.', [2, 4], 5)] });
+  } else {
+    for (let r = 1; r <= 6; r++) { const fe = F('esq.', seq(1, 23, 2), 4, p => (p === 1 || p === 13) ? 1 : 2), fd = F('dir.', seq(2, 24, 2), 4, p => (p === 2 || p === 14) ? 1 : 2), f1 = F('dir.', seq(1, 12), 4, p => (p === 1 || p === 7) ? 1 : 2); ruas.push({ rua: r, faces: r === 1 ? [f1] : [fe, fd], corredorApos: 6 }); }
+    ruas.push({ rua: 7, nome: 'Bebidas / Bazar', rtl: true, faces: [F('dir.', seq(1, 17), p => p <= 5 ? 3 : p <= 8 ? 4 : p <= 11 ? 2 : 4, null, '', true), Object.assign(F('esq.', seq(1, 12), 4, p => (p === 1 || p === 7) ? 1 : 2, 'E'), { corr: 6 })] });
+  }
+  return ruas;
+}
+const ADDR = {};
+function buildAddr(site, loja) {
+  const struct = buildStruct(site, loja), list = [], map = new Map(), byRua = {};
+  for (const R of struct) {
+    byRua[R.rua] = [];
+    for (const F of R.faces) for (const pr of F.preds) for (let n = 1; n <= pr.n; n++) for (let a = 1; a <= pr.ap; a++) {
+      const code = `${pad(R.rua, 2)}-${F.tag ? F.tag + '-' : ''}${pad(pr.p, 3)}-${n}-${pad(a, 2)}`;
+      const o = { code, rua: R.rua, p: pr.p, n, a, face: F.face };
+      list.push(o); map.set(code, o); byRua[R.rua].push(o);
+    }
+  }
+  return { struct, list, map, byRua };
+}
+const rebuildAddr = () => { for (const s of Object.keys(SITES)) ADDR[s] = buildAddr(s, S.cfg.loja); };
+const firstRua = () => (ADDR[S.cfg.site].struct[0] || { rua: 1 }).rua;
+
+/* ---------------- estado ---------------- */
+const freshSync = () => ({ dev: Math.random().toString(36).slice(2, 8), url: '', prodOk: false, lojas: {}, base: { prod: {}, stock: {} }, movRow: {} });
+function lojaData(o, id) { o.lojas = o.lojas || {}; const L = o.lojas[id] || (o.lojas[id] = {}); L.stock = L.stock || {}; L.stock.DEP = L.stock.DEP || {}; L.stock.LOJ = L.stock.LOJ || {}; L.mov = L.mov || []; return L; }
+/* S.stock e S.mov apontam sempre para os dados da loja ativa (S.cfg.loja); os de todas as lojas ficam em S.lojas */
+function wrapS(o) {
+  Object.defineProperty(o, 'stock', { get() { return lojaData(o, o.cfg.loja).stock; }, set(v) { lojaData(o, o.cfg.loja).stock = v; }, enumerable: false, configurable: true });
+  Object.defineProperty(o, 'mov', { get() { return lojaData(o, o.cfg.loja).mov; }, set(v) { lojaData(o, o.cfg.loja).mov = v; }, enumerable: false, configurable: true });
+  return o;
+}
+function blank() { return wrapS({ v: 2, cfg: { op: '', hook: '', token: '', site: 'DEP', loja: 'SHO' }, prod: [], lojas: { SHO: { stock: { DEP: {}, LOJ: {} }, mov: [] } }, seq: { prod: 1, mov: 1 }, sync: freshSync() }); }
+function norm(o) {
+  const b = blank(), r = { ...b, ...o, cfg: { ...b.cfg, ...(o.cfg || {}) }, seq: { ...b.seq, ...(o.seq || {}) }, sync: { ...b.sync, ...(o.sync || {}) } };
+  r.lojas = o.lojas || {};
+  if (!o.lojas && (o.stock || o.mov)) r.lojas.SHO = { stock: { DEP: {}, LOJ: {}, ...(o.stock || {}) }, mov: o.mov || [] }; /* dados da versão anterior = loja Shopping BG */
+  delete r.stock; delete r.mov; r.v = 2;
+  if (!LOJAS.some(l => l.id === r.cfg.loja)) r.cfg.loja = 'SHO';
+  wrapS(r); LOJAS.forEach(l => lojaData(r, l.id));
+  return r;
+}
+function load() { try { const raw = localStorage.getItem(KEY); if (raw) { const o = JSON.parse(raw); if (!o.lojas && !SELFTEST) { try { if (!localStorage.getItem(KEY + '-pre-multiloja')) localStorage.setItem(KEY + '-pre-multiloja', raw); } catch (e) {} } return norm(o); } } catch (e) {} return blank(); }
+let S = load();
+rebuildAddr();
+function persist() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Não foi possível salvar: armazenamento cheio. Exporte um backup.', 'bad'); } }
+function save() { persist(); scheduleSync(); }
+const site = () => S.cfg.site;
+const stock = () => S.stock[site()];
+const P = id => S.prod.find(x => x.id === id);
+const usedPids = () => { const u = new Set(); for (const LD of Object.values(S.lojas)) for (const k of Object.keys(LD.stock)) for (const c of Object.keys(LD.stock[k])) for (const l of LD.stock[k][c]) u.add(l.pid); return u; };
+const newPid = () => Date.now() * 1000 + Math.floor(Math.random() * 1000);
+const lineQ = L => L.reduce((a, l) => a + l.q, 0);
+
+/* ---------------- regras de negócio ---------------- */
+function addrInfo(st, code) {
+  const L = (S.stock[st] || {})[code] || [];
+  if (!L.length) return { st: 'vazio', L };
+  let w = 'ocupado';
+  for (const l of L) { if (!l.val) continue; const d = daysTo(l.val); if (d < 0) { w = 'vencido'; break; } if (d <= 30) w = 'avencer'; }
+  return { st: w, L };
+}
+function valChip(val) {
+  if (!val) return '';
+  const d = daysTo(val);
+  if (d < 0) return `<span class="chip bad">Vencido há ${-d}d</span>`;
+  if (d <= 30) return `<span class="chip warn">Vence em ${d}d</span>`;
+  return `<span class="chip ok">Val. ${fmtD(val)}</span>`;
+}
+function parseAddr(st, txt) {
+  if (!txt) return null;
+  let t = String(txt).trim().toUpperCase(), tag = ''; let code = null;
+  if (t.includes('E')) { tag = 'E-'; t = t.replace(/E/g, ''); }
+  const m = t.match(/^(\d{1,2})\D+(\d{1,3})\D+(\d)\D+(\d{1,2})$/);
+  if (m) code = `${pad(m[1], 2)}-${pad(m[2], 3)}-${m[3]}-${pad(m[4], 2)}`;
+  else { const d = t.replace(/\D/g, ''); if (d.length === 8) code = `${d.slice(0, 2)}-${d.slice(2, 5)}-${d.slice(5, 6)}-${d.slice(6, 8)}`; }
+  if (code && tag) code = code.slice(0, 3) + tag + code.slice(3);
+  return code && ADDR[st].map.has(code) ? code : null;
+}
+function cleanup(st, code) { const L = S.stock[st][code]; if (L && !L.length) delete S.stock[st][code]; }
+function addLine(st, code, pid, q, val, lote) {
+  const L = S.stock[st][code] || (S.stock[st][code] = []);
+  const ln = L.find(x => x.pid === pid && (x.val || '') === (val || '') && (x.lote || '') === (lote || ''));
+  if (ln) ln.q += q; else L.push({ pid, q, val: val || '', lote: lote || '', dt: today() });
+}
+function takeLine(st, code, idx, q) {
+  const L = S.stock[st][code]; const ln = L && L[idx];
+  if (!ln) throw new Error('Linha de estoque não encontrada.');
+  if (q > ln.q) throw new Error(`Quantidade maior que o saldo da linha (${fmtN(ln.q)}).`);
+  const out = { pid: ln.pid, q, val: ln.val, lote: ln.lote };
+  ln.q -= q; if (ln.q <= 0) L.splice(idx, 1); cleanup(st, code); return [out];
+}
+function takeFEFO(st, code, pid, q) {
+  const L = (S.stock[st][code] || []).filter(l => l.pid === pid).sort((a, b) => (a.val || '9999').localeCompare(b.val || '9999'));
+  const tot = lineQ(L); if (q > tot) throw new Error(`Saldo insuficiente no endereço (${fmtN(tot)}).`);
+  const out = []; let rest = q;
+  for (const l of L) { if (rest <= 0) break; const t = Math.min(l.q, rest); out.push({ pid, q: t, val: l.val, lote: l.lote }); l.q -= t; rest -= t; }
+  S.stock[st][code] = S.stock[st][code].filter(l => l.q > 0); cleanup(st, code); return out;
+}
+function logMove(m) {
+  const rec = { id: S.seq.mov++, ts: nowIso(), op: S.cfg.op || '', ...m };
+  S.mov.push(rec); if (S.mov.length > 5000) S.mov.splice(0, S.mov.length - 5000);
+  return rec;
+}
+function hook() {} /* o envio agora é feito pela sincronização (ver SY) */
+function opEntrada(o) {
+  const st = o.site; if (!ADDR[st].map.has(o.dest)) return { err: 'Endereço de destino inválido.' };
+  if (!P(o.pid)) return { err: 'Selecione um produto.' };
+  if (!(o.q > 0)) return { err: 'Informe uma quantidade maior que zero.' };
+  addLine(st, o.dest, o.pid, o.q, o.val, o.lote);
+  logMove({ site: st, tipo: 'ENTRADA', pid: o.pid, q: o.q, dest: o.dest, val: o.val || '', lote: o.lote || '', obs: o.obs || '' });
+  save(); return { ok: true };
+}
+function opSaida(o) {
+  const st = o.site; if (!ADDR[st].map.has(o.orig)) return { err: 'Endereço de origem inválido.' };
+  if (!(o.q > 0)) return { err: 'Informe uma quantidade maior que zero.' };
+  try {
+    const parts = o.idx != null ? takeLine(st, o.orig, o.idx, o.q) : takeFEFO(st, o.orig, o.pid, o.q);
+    for (const p of parts) logMove({ site: st, tipo: 'SAIDA', pid: p.pid, q: p.q, orig: o.orig, val: p.val, lote: p.lote, obs: o.obs || '' });
+    save(); return { ok: true };
+  } catch (e) { return { err: e.message }; }
+}
+function opTransf(o) {
+  const st = o.site;
+  if (!ADDR[st].map.has(o.orig)) return { err: 'Endereço de origem inválido.' };
+  if (!ADDR[st].map.has(o.dest)) return { err: 'Endereço de destino inválido.' };
+  if (o.orig === o.dest) return { err: 'Origem e destino são o mesmo endereço.' };
+  if (!(o.q > 0)) return { err: 'Informe uma quantidade maior que zero.' };
+  try {
+    const parts = o.idx != null ? takeLine(st, o.orig, o.idx, o.q) : takeFEFO(st, o.orig, o.pid, o.q);
+    for (const p of parts) { addLine(st, o.dest, p.pid, p.q, p.val, p.lote); logMove({ site: st, tipo: 'TRANSF', pid: p.pid, q: p.q, orig: o.orig, dest: o.dest, val: p.val, lote: p.lote, obs: o.obs || '' }); }
+    save(); return { ok: true };
+  } catch (e) { return { err: e.message }; }
+}
+function opAjuste(o) {
+  const st = o.site, L = S.stock[st][o.orig], ln = L && L[o.idx];
+  if (!ln) return { err: 'Selecione a linha de estoque a ajustar.' };
+  if (!(o.q >= 0) || isNaN(o.q)) return { err: 'Informe a nova quantidade (zero ou mais).' };
+  const delta = o.q - ln.q; if (delta === 0) return { err: 'A quantidade informada é igual ao saldo atual.' };
+  const info = { pid: ln.pid, val: ln.val, lote: ln.lote };
+  if (o.q === 0) L.splice(o.idx, 1); else ln.q = o.q; cleanup(st, o.orig);
+  logMove({ site: st, tipo: 'AJUSTE', pid: info.pid, q: delta, orig: o.orig, val: info.val, lote: info.lote, obs: o.obs || 'Ajuste de inventário' });
+  save(); return { ok: true };
+}
+
+/* ---------------- estatísticas ---------------- */
+function stats(st) {
+  const A = ADDR[st], stk = S.stock[st]; let occ = 0, units = 0, lines = 0; const skus = new Set(), venc = [], avenc = [], byRua = {};
+  for (const r of Object.keys(A.byRua)) byRua[r] = { tot: A.byRua[r].length, occ: 0, units: 0, skus: new Set() };
+  for (const code of Object.keys(stk)) {
+    const L = stk[code]; if (!L.length) continue; occ++; const r = +code.slice(0, 2);
+    if (byRua[r]) byRua[r].occ++;
+    for (const l of L) {
+      units += l.q; lines++; skus.add(l.pid); if (byRua[r]) { byRua[r].units += l.q; byRua[r].skus.add(l.pid); }
+      if (l.val) { const d = daysTo(l.val); if (d < 0) venc.push({ code, l, d }); else if (d <= 30) avenc.push({ code, l, d }); }
+    }
+  }
+  venc.sort((a, b) => a.d - b.d); avenc.sort((a, b) => a.d - b.d);
+  const tot = A.list.length;
+  const byProd = {}; for (const code of Object.keys(stk)) for (const l of stk[code]) byProd[l.pid] = (byProd[l.pid] || 0) + l.q;
+  const low = S.prod.filter(p => p.min > 0 && (byProd[p.id] || 0) < p.min).map(p => ({ p, q: byProd[p.id] || 0 }));
+  return { tot, occ, vazio: tot - occ, pct: tot ? occ / tot * 100 : 0, units, lines, skus: skus.size, venc, avenc, byRua, low, byProd };
+}
+
+/* ---------------- código de barras Code 39 (sem dependências) ---------------- */
+const C39 = { '0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw','5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn','-':'nwnnnnwnw','*':'nwnnwnwnn','E':'wnnnwwnnn' };
+function code39(txt) {
+  const s = '*' + txt + '*', wide = 2.6; let x = 0, out = '';
+  for (const ch of s) { const p = C39[ch]; if (!p) continue; for (let i = 0; i < 9; i++) { const w = p[i] === 'w' ? wide : 1; if (i % 2 === 0) out += `<rect x="${x.toFixed(2)}" y="0" width="${w}" height="40"/>`; x += w; } x += 1; }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${x.toFixed(2)} 40" preserveAspectRatio="none" role="img" aria-label="${esc(txt)}">${out}</svg>`;
+}
+
+/* ---------------- UI utilitários ---------------- */
+const IC = {
+  painel: '<path d="M4 13h6V4H4zM14 20h6V4h-6zM4 20h6v-3H4z"/>',
+  mapa: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',
+  planta: '<path d="M3 3h18v18H3zM9 3v18M15 3v18M3 12h18"/>',
+  busca: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M9 11h4M11 9v4"/>',
+  end: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  mover: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+  prod: '<path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/>',
+  rel: '<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7"/>',
+  etq: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/>',
+  cfg: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  mais: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'
+};
+const ic = n => `<svg class="ic" viewBox="0 0 24 24">${IC[n] || ''}</svg>`;
+const NAV = [['painel', 'Painel'], ['planta', 'Planta'], ['busca', 'Busca de produtos'], ['end', 'Endereços'], ['mover', 'Movimentar'], ['prod', 'Produtos'], ['rel', 'Relatórios'], ['etq', 'Etiquetas'], ['cfg', 'Configurações']];
+const BAR = ['painel', 'planta', 'end', 'mover'];
+function toast(msg, kind) { const t = document.createElement('div'); t.className = 'tt ' + (kind || ''); t.textContent = msg; $('#toast').appendChild(t); setTimeout(() => t.remove(), 3600); }
+function openMod(html) { $('#mb').innerHTML = html; $('#mod').classList.add('on'); }
+function closeMod() { $('#mod').classList.remove('on'); $('#mb').innerHTML = ''; stopScan(); }
+function openDr(html) { $('#dr').innerHTML = html; $('#ov').classList.add('on'); }
+function closeDr() { $('#ov').classList.remove('on'); $('#dr').innerHTML = ''; }
+function download(name, text, mime) { const b = new Blob([text], { type: mime || 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function csv(rows) { return '﻿' + rows.map(r => r.map(c => { const s = String(c ?? ''); return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(';')).join('\r\n'); }
+function emptyBox(msg, btn) { return `<div class="empty">${msg}${btn ? '<div style="margin-top:12px">' + btn + '</div>' : ''}</div>`; }
+
+/* ---------------- estado de interface ---------------- */
+const UI = { tab: 'painel', rua: 1, show: 'status', fl: { q: '', rua: '', st: '' }, lim: 80, rep: 'mov', rf: { de: '', ate: '', tipo: '', q: '', d: '' }, lb: { rua: 1, face: '', p1: 1, p2: 999, niv: '', cols: 2 }, pq: '', mv: { tipo: 'ENTRADA', orig: '', dest: '', pid: null, idx: null, q: '', val: '', lote: '', obs: '' }, sel: '' };
+
+/* ---------------- VIEWS ---------------- */
+const VIEWS = {};
+
+VIEWS.painel = () => {
+  const st = site(), s = stats(st), nm = SITES[st];
+  const empty = !S.prod.length && !s.lines;
+  let h = `<h1 class="pt">Painel · ${nm}</h1><p class="sub">Visão geral da ocupação e dos alertas de estoque do ${nm.toLowerCase()}.</p>`;
+  if (empty) h += `<div class="banner"><div><b>Comece por aqui.</b> Cadastre produtos e registre entradas ou importe uma planilha (Excel ou CSV).</div><div class="row"><button class="btn p" data-act="tab" data-t="prod">Cadastrar produtos</button></div></div>`;
+  h += `<div class="grid kpis">
+    <div class="kpi"><b>${fmtN(s.tot)}</b><span>Endereços</span></div>
+    <div class="kpi"><b>${fmtN(s.occ)}</b><span>Ocupados</span></div>
+    <div class="kpi"><b>${fmtN(s.vazio)}</b><span>Vazios</span></div>
+    <div class="kpi"><b>${s.pct.toFixed(1).replace('.', ',')}%</b><span>Taxa de ocupação</span></div>
+    <div class="kpi"><b>${fmtN(s.skus)}</b><span>Produtos distintos</span></div>
+    <div class="kpi"><b>${fmtN(s.units)}</b><span>Unidades em estoque</span></div></div>`;
+  h += `<div class="grid two" style="margin-top:12px"><div class="grid" style="align-content:start">`;
+  // alertas
+  const al = [...s.venc.map(x => ({ ...x, k: 'bad' })), ...s.avenc.map(x => ({ ...x, k: 'warn' }))].slice(0, 8);
+  h += `<div class="card"><h3>Alertas de validade <span class="chip bad">${s.venc.length} vencidos</span><span class="chip warn">${s.avenc.length} a vencer (30d)</span></h3>`;
+  h += al.length ? `<div class="list">${al.map(x => `<button class="li" data-act="addr" data-c="${x.code}"><div><b class="mono">${x.code}</b><div class="hint">${esc((P(x.l.pid) || {}).desc || '?')} · ${fmtN(x.l.q)} un</div></div>${valChip(x.l.val)}</button>`).join('')}</div>` : emptyBox('Nenhum alerta de validade.');
+  h += `</div>`;
+  h += `</div></div><div class="grid" style="align-content:start">`;
+  h += `<div class="card"><h3>Ocupação por rua</h3>${Object.keys(s.byRua).map(r => { const x = s.byRua[r], p = x.tot ? x.occ / x.tot * 100 : 0; const nome = (ADDR[st].struct.find(q => q.rua == r) || {}).nome; return `<div style="margin-bottom:10px;cursor:pointer" data-act="maprua" data-r="${r}"><div class="row sp"><b>Rua ${pad(r, 2)}${nome ? ' · ' + esc(nome) : ''}</b><span class="hint">${x.occ}/${x.tot} · ${p.toFixed(0)}%</span></div><div class="bar-o"><i style="width:${p}%"></i></div></div>`; }).join('')}</div>`;
+  const mv = S.mov.filter(m => m.site === st).slice(-8).reverse();
+  h += `<div class="card"><h3>Últimas movimentações</h3>${mv.length ? `<div class="list">${mv.map(m => `<div class="li"><div><span class="chip ${m.tipo === 'ENTRADA' ? 'ok' : m.tipo === 'SAIDA' ? 'bad' : m.tipo === 'TRANSF' ? 'y' : 'n'}">${tipoNome(m.tipo)}</span> <b>${esc((P(m.pid) || {}).desc || '?')}</b><div class="hint">${fmtTs(m.ts)} · ${m.orig ? m.orig : ''}${m.orig && m.dest ? ' → ' : ''}${m.dest ? m.dest : ''}</div></div><b>${m.tipo === 'AJUSTE' && m.q > 0 ? '+' : ''}${fmtN(m.q)}</b></div>`).join('')}</div>` : emptyBox('Sem movimentações ainda.')}</div>`;
+  return h + `</div></div>`;
+};
+const tipoNome = t => ({ ENTRADA: 'Entrada', SAIDA: 'Saída', TRANSF: 'Transferência', AJUSTE: 'Ajuste' }[t] || t);
+
+
+function plantaSVG(st, hl) {
+  const HL = new Map(); for (const o of (hl || [])) { const q = ADDR[st].map.get(o.code); if (q) HL.set(`${q.rua}|${q.face}|${q.p}`, { ...(HL.get(`${q.rua}|${q.face}|${q.p}`) || {}), ...o, n: q.n, a: q.a }); }
+  const A = ADDR[st], Y0 = 100, Y1 = 414, GAP = 26, FW = 40, CG = 4, N = '#1B2A4A', Y = '#FFC400';
+  const L = []; const a = x => L.push(x);
+  const corrOf = (R, F) => F.corr || (R.corredorApos && !R.rtl ? R.corredorApos : 0);
+  let x = 44, hasC = false, xe = 0; const cols = [];
+  for (const R of A.struct) {
+    const fs = R.faces.slice().sort((p, q) => (p.face === 'esq.' ? 0 : 1) - (q.face === 'esq.' ? 0 : 1));
+    const aw = R.rtl ? 48 : 30;
+    const pos = { R, fs, aw, faces: [] };
+    if (fs.length === 2) { pos.faces = [[fs[0], x], [fs[1], x + FW + aw]]; pos.ax = x + FW; pos.w = 2 * FW + aw; }
+    else { pos.faces = [[fs[0], x + aw]]; pos.ax = x; pos.w = FW + aw; }
+    for (const F of fs) if (corrOf(R, F)) hasC = true;
+    cols.push(pos); x += pos.w + CG;
+  }
+  const xr = x - CG, W = xr + 40;
+  a(`<svg viewBox="0 0 ${W} 500" xmlns="http://www.w3.org/2000/svg">`);
+  a(`<rect x="2" y="2" width="${W - 4}" height="496" fill="#fff" stroke="${N}" stroke-width="4"/>`);
+  const wall = (wx) => a(`<rect x="${wx}" y="${Y0}" width="20" height="${Y1 - Y0}" fill="#C9CDD6"/><text x="${wx + 10}" y="${(Y0 + Y1) / 2}" font-size="10" font-weight="700" text-anchor="middle" fill="#555" transform="rotate(-90 ${wx + 10} ${(Y0 + Y1) / 2})">PAREDE</text>`);
+  wall(22); wall(xr + 4);
+  for (const c of cols) {
+    const R = c.R, cx = c.ax + c.aw / 2, num = pad(R.rua, 2);
+    a(`<rect x="${c.ax}" y="${Y0}" width="${c.aw}" height="${Y1 - Y0}" fill="#FAFAF7"/>`);
+    a(`<line x1="${cx}" y1="${Y0}" x2="${cx}" y2="${Y1}" stroke="#B8BDC9" stroke-dasharray="6 6"/>`);
+    a(`<g class="rr" data-act="maprua" data-r="${R.rua}"><rect x="${cx - 25}" y="68" width="50" height="24" rx="6" fill="${R.nome ? Y : N}"/><text x="${cx}" y="84" font-size="11.5" font-weight="700" text-anchor="middle" fill="${R.nome ? N : Y}">RUA ${num}</text></g>`);
+    a(`<line x1="${cx}" y1="${Y1 - 5}" x2="${cx}" y2="${Y0 + 12}" stroke="#8892A6" stroke-width="3"/><polygon points="${cx},${Y0 + 2} ${cx - 8},${Y0 + 20} ${cx + 8},${Y0 + 20}" fill="#8892A6"/>`);
+    for (const [F, fx] of c.faces) {
+      const n = F.preds.length, cr = corrOf(R, F);
+      const h = cr ? (Y1 - Y0 - GAP) / 12 : (Y1 - Y0) / Math.max(st === 'DEP' ? 11 : 12, n);
+      F.preds.forEach((pr, i) => {
+        const k = i + 1, y = Y1 - k * h - (cr && k > cr ? GAP : 0);
+        a(`<g class="rr" data-act="maprua" data-r="${R.rua}"><rect x="${fx}" y="${y.toFixed(1)}" width="${FW}" height="${h.toFixed(1)}" fill="${R.nome ? '#FFE9A0' : '#E4E7EE'}" stroke="#9AA3B5"/>`);
+        const nl = Math.min(pr.n, 4);
+        for (let lv = 0; lv < pr.n; lv++) { const ly = y + h - 3.5 - lv * (h - 7) / Math.max(pr.n - 1, 1); a(`<line x1="${fx + 4}" y1="${ly.toFixed(1)}" x2="${fx + 13}" y2="${ly.toFixed(1)}" stroke="#7C869B" stroke-width="1.4" stroke-linecap="round"/>`); }
+        a(`<text x="${fx + 22}" y="${(y + h / 2 + 3.2).toFixed(1)}" font-size="${h < 20 ? 8 : 9.5}" text-anchor="middle" fill="#555">${pad(pr.p, 3)}</text>`);
+        if (pr.ap === 1) a(`<circle cx="${fx + FW - 5}" cy="${(y + h / 2).toFixed(1)}" r="4.5" fill="${N}"/><text x="${fx + FW - 5}" y="${(y + h / 2 + 2.4).toFixed(1)}" font-size="6.5" font-weight="700" text-anchor="middle" fill="#fff">1</text>`);
+        a(`</g>`);
+        const hh = HL.get(`${R.rua}|${F.face}|${pr.p}`);
+        if (hh) {
+          const bx = F.face === 'esq.' ? fx + FW + 8 : fx - 8, by = y + h / 2, col = hh.sel ? '#D62828' : '#F28C1B';
+          a(`<rect x="${fx}" y="${y.toFixed(1)}" width="${FW}" height="${h.toFixed(1)}" fill="${col}" fill-opacity=".30" stroke="${col}" stroke-width="3"/>`);
+          a(`<circle cx="${bx}" cy="${by.toFixed(1)}" r="9" fill="${col}" fill-opacity=".35"><animate attributeName="r" values="8;15;8" dur="1.6s" repeatCount="indefinite"/><animate attributeName="fill-opacity" values=".5;0;.5" dur="1.6s" repeatCount="indefinite"/></circle><circle cx="${bx}" cy="${by.toFixed(1)}" r="8" fill="${col}" stroke="#fff" stroke-width="1.5"/><text x="${bx}" y="${(by + 3.4).toFixed(1)}" font-size="${String(hh.num || '').length > 1 ? 8 : 10}" font-weight="800" text-anchor="middle" fill="#fff">${hh.num || '●'}</text>`);
+        }
+      });
+      const lab = R.nome ? (F.tag === 'E' ? 'LADO ESQ.' : 'BEBIDAS/BAZAR') : F.face === 'esq.' ? 'ÍMPARES' : F.face === 'dir.' ? (F.preds[0].p === 1 ? '1 A 12' : 'PARES') : 'ÚNICA';
+      a(`<text x="${fx + FW / 2}" y="${Y1 + 11}" font-size="7" font-weight="700" text-anchor="middle" fill="${N}">${lab}</text>`);
+    }
+    if (c.R.corredorApos || c.fs.some(F => F.corr)) xe = c.ax + c.aw;
+  }
+  if (hasC) {
+    const cy0 = Y1 - 6 * ((Y1 - Y0 - GAP) / 12) - GAP, ym = cy0 + GAP / 2, mid = (44 + xe) / 2;
+    a(`<rect x="44" y="${cy0}" width="${xe - 44}" height="${GAP}" fill="#FFF0B3" stroke="${N}" stroke-dasharray="8 5"/>`);
+    a(`<line x1="70" y1="${ym}" x2="${xe - 26}" y2="${ym}" stroke="${N}" stroke-width="2"/><polygon points="${xe - 6},${ym} ${xe - 20},${ym - 6} ${xe - 20},${ym + 6}" fill="${N}"/><polygon points="50,${ym} 64,${ym - 6} 64,${ym + 6}" fill="${N}"/>`);
+    a(`<rect x="${mid - 190}" y="${cy0 + 3}" width="380" height="${GAP - 6}" fill="#FFF0B3"/><text x="${mid}" y="${ym + 4}" font-size="11" font-weight="700" text-anchor="middle" fill="${N}">CORREDOR TRANSVERSAL · entre os vãos 6 e 7</text>`);
+  }
+  a(`<rect x="44" y="${Y1 + 16}" width="${xr - 44}" height="24" fill="#EEF1F7" stroke="${N}" stroke-dasharray="8 5"/><text x="${(44 + xr) / 2}" y="${Y1 + 33}" font-size="12" font-weight="700" text-anchor="middle" fill="${N}">ENTRADA DAS RUAS · numeração dos prédios a partir daqui (seta ↑)</text>`);
+  a(`<circle cx="64" cy="${Y1 + 62}" r="6" fill="${N}"/><text x="64" y="${Y1 + 64.8}" font-size="8" font-weight="700" text-anchor="middle" fill="#fff">1</text><text x="76" y="${Y1 + 66}" font-size="10" fill="#333">1 apto por nível · traços = níveis (base → topo) · toque na rua para abrir o mapa</text>`);
+  a('</svg>');
+  return L.join('');
+}
+
+function plantaInfo(st, codes) {
+  return codes.map(c => { const a = ADDR[st].map.get(c); if (!a) return ''; const L = (S.stock[st] || {})[c] || [];
+    return `<div class="ln"><div class="row sp" style="flex-wrap:nowrap"><div><b class="mono">${c}</b><div class="hint">Rua ${pad(a.rua, 2)} · Prédio ${pad(a.p, 3)} · Nível ${a.n} · Apto ${pad(a.a, 2)}${a.face && a.face !== 'única' ? ' · lado ' + a.face : ''}</div></div><button class="btn sm" data-act="addr" data-c="${c}">Abrir</button></div>${L.length ? L.map(l => { const p = P(l.pid) || {}; return `<div class="mt"><b>${esc(p.desc || '?')}</b><span>${fmtN(l.q)} ${esc(p.un || 'un')}</span>${valChip(l.val)}</div>`; }).join('') : '<div class="hint">Endereço vazio.</div>'}</div>`; }).join('');
+}
+const semPlanta = () => `<h1 class="pt">${esc(LOJA_NOME(S.cfg.loja))}</h1><div class="card"><h3>Planta ainda não cadastrada</h3><p class="hint" style="margin-top:0">A planta e os endereços desta loja (ruas, prédios, níveis e apartamentos) serão cadastrados mantendo o mesmo padrão da loja Shopping BG. Enquanto isso, você já pode cadastrar produtos: o cadastro é único para toda a rede.</p><div class="row"><button class="btn d" data-act="tab" data-t="prod">Ir para Produtos</button><button class="btn" data-act="loja-sho">Voltar ao Shopping BG</button></div></div>`;
+VIEWS.planta = () => {
+  if (UI.mv2 === 'rua') return VIEWS.mapa();
+  const st = UI.plsite || site(), hl = ((UI.pl || {}).site === st ? (UI.pl || {}).hl || [] : []).filter(c => ADDR[st].map.has(c));
+  let h = `<h1 class="pt">Planta · ${SITES[st]}</h1><div class="seg light" style="margin-bottom:8px"><button class="on" data-act="mapv" data-v="planta">Planta</button><button data-act="mapv" data-v="rua">Por rua</button></div><div class="seg light" style="margin-bottom:12px">${Object.keys(SITES).map(k => `<button class="${st === k ? 'on' : ''}" data-act="plsite" data-s="${k}">${SITES[k]}</button>`).join('')}</div><p class="sub">${hl.length ? 'Posição destacada na planta (vista superior). O número aponta o prédio onde está o endereço.' : 'Vista superior de todas as ruas. Toque em um endereço (Relatórios, Busca ou Endereços) para ver a posição aqui.'}</p>`;
+  if (hl.length) h += `<div class="card" style="margin-bottom:12px"><div class="row sp"><b style="color:var(--n)">Endereço${hl.length > 1 ? 's' : ''} na planta</b><button class="btn sm" data-act="plclear">Limpar destaque</button></div><div style="margin-top:8px">${plantaInfo(st, hl)}</div></div>`;
+  return h + `<div class="pl" id="bpl">${plantaSVG(st, hl.map((c, i) => ({ code: c, num: hl.length > 1 ? i + 1 : '', sel: true })))}</div>`;
+};
+function buscaRes(st, q) {
+  const ql = q.trim().toLowerCase(); if (!ql) return null;
+  const raw = q.trim();
+  let ps = S.prod.filter(p => (p.ean && p.ean === raw) || p.cod.toLowerCase() === ql);
+  if (!ps.length) ps = S.prod.filter(p => (p.cod + ' ' + (p.ean || '') + ' ' + p.desc).toLowerCase().includes(ql));
+  const ids = new Set(ps.map(p => p.id)), rows = [];
+  for (const c of Object.keys(S.stock[st] || {})) for (const l of S.stock[st][c]) if (ids.has(l.pid)) rows.push({ c, l, p: P(l.pid) });
+  rows.sort((a, b) => (a.l.val || '9999').localeCompare(b.l.val || '9999') || a.c.localeCompare(b.c));
+  return { ps, rows };
+}
+VIEWS.busca = () => {
+  const st = site(), q = UI.bq || '', R = buscaRes(st, q);
+  let h = `<h1 class="pt">Busca de produtos · ${SITES[st]}</h1><p class="sub">Digite ou leia o código de barras, ou parte da descrição, para ver onde o produto está.</p>`;
+  h += `<div class="card" style="margin-bottom:12px"><div class="row" style="flex-wrap:nowrap"><input class="in" id="bq" value="${esc(q)}" placeholder="Código de barras, código ou descrição" autocomplete="off" inputmode="search">${('BarcodeDetector' in window) ? '<button class="btn" type="button" data-act="scan" data-f="bq">Ler</button>' : ''}</div></div>`;
+  if (!S.prod.length) h += emptyBox('Nenhum produto na base ainda. Suba uma base (Excel ou CSV) com código de barras e descrição.', '<button class="btn p" data-act="imp-prod">Subir base de produtos (Excel/CSV)</button><input type="file" id="f-prod" accept=".csv,.xlsx,.xlsm,text/csv,.txt" hidden>');
+  if (!R) return h;
+  if (!R.ps.length) return h + `<div class="card" style="background:#FFF8DC"><div class="hint"><b>Produto não encontrado.</b> Inclua manualmente na base:</div><input class="in" id="bq-d" placeholder="Descrição do produto" value="${isCodeTxt(q) ? '' : esc(q.trim())}" style="margin:6px 0" autocomplete="off"><div class="row"><button type="button" class="btn p" data-act="bqnew">Incluir produto</button></div></div>`;
+  const codes = [], num = {}; for (const r of R.rows) if (!(r.c in num) && codes.length < 40) { codes.push(r.c); num[r.c] = codes.length; }
+  const sel = UI.bsel && num[UI.bsel] ? UI.bsel : '';
+  h += `<div class="card" style="margin-bottom:12px"><b style="color:var(--n)">${R.ps.length} produto(s) · ${R.rows.length} posição(ões) em ${SITES[st]}</b>`;
+  if (!R.rows.length) h += `<div class="hint" style="margin-top:6px">${R.ps.slice(0, 5).map(p => esc(p.desc)).join(', ')} — sem estoque nesta unidade.</div>`;
+  else h += `<div class="tw" style="margin-top:8px"><table class="t"><tr><th>#</th><th>Endereço</th><th>Descrição</th><th style="text-align:right">Qtd</th><th>Validade</th></tr>${R.rows.slice(0, 80).map(r => `<tr style="cursor:pointer${sel === r.c ? ';background:#FFF8DC' : ''}" data-act="bsel" data-c="${r.c}"><td>${num[r.c] ? `<b style="color:#fff;background:${sel === r.c ? '#D62828' : '#F28C1B'};border-radius:50%;display:inline-grid;place-items:center;width:20px;height:20px;font-size:11px">${num[r.c]}</b>` : ''}</td><td class="mono"><b>${r.c}</b></td><td><b>${esc(r.p.desc)}</b><div class="hint mono">${esc(r.p.cod)}${r.p.ean ? ' · ' + esc(r.p.ean) : ''}</div></td><td style="text-align:right"><b>${fmtN(r.l.q)}</b> ${esc(r.p.un || '')}</td><td>${r.l.val ? valChip(r.l.val) : '<span class="hint">sem validade</span>'}${r.l.lote ? `<div class="hint">lote ${esc(r.l.lote)}</div>` : ''}</td></tr>`).join('')}</table></div><p class="hint">Toque em uma linha para destacar o endereço na planta.${R.rows.length > 80 ? ' Mostrando 80 posições.' : ''}</p>`;
+  h += `</div>`;
+  if (R.rows.length) h += `<div class="pl" id="bpl">${plantaSVG(st, codes.map(c => ({ code: c, num: num[c], sel: sel ? c === sel : true })))}</div>`;
+  return h;
+};
+
+VIEWS.mapa = () => {
+  const st = site(), A = ADDR[st];
+  if (!A.struct.find(x => x.rua === UI.rua)) UI.rua = A.struct[0].rua;
+  const R = A.struct.find(x => x.rua === UI.rua);
+  let h = `<h1 class="pt">Mapa · ${SITES[st]}</h1><p class="sub">${UI.mv2 === 'planta' ? 'Planta com vista superior de todas as ruas. Toque em uma rua para abrir o mapa dela.' : 'Vista frontal de cada rua. Toque em um apartamento para ver ou movimentar o estoque.'}</p>`;
+  h += `<div class="seg light" style="margin-bottom:12px"><button data-act="mapv" data-v="planta">Planta</button><button class="on" data-act="mapv" data-v="rua">Por rua</button></div>`;
+  if (UI.mv2 === 'planta') return h + `<div class="pl">${plantaSVG(st)}</div>`;
+  h += `<div class="chips">${A.struct.map(r => `<button class="${r.rua === UI.rua ? 'on' : ''}" data-act="maprua" data-r="${r.rua}">Rua ${pad(r.rua, 2)}${r.nome ? ' · ' + esc(r.nome) : ''}</button>`).join('')}</div>`;
+  h += `<div class="row sp"><div class="legend"><span><i style="background:#E4E7EE"></i>Vazio</span><span><i style="background:var(--y)"></i>Ocupado</span><span><i style="background:var(--warn)"></i>Vence em até 30 dias</span><span><i style="background:var(--bad)"></i>Vencido</span><span><b>nº</b> = mais de um produto</span><span>Cada prédio = 1 ou 2 colunas (aptos 01 e 02); com 1 coluna só existe o apto 01</span></div></div>`;
+  for (const F of R.faces) {
+    let preds = F.preds.slice(); if (R.rtl) preds.reverse();
+    const maxN = Math.max(...preds.map(x => x.n));
+    const corr = F.corr || (R.corredorApos && !R.rtl ? R.corredorApos : 0);
+    let cols = ['34px'], items = [];
+    for (const [ix, pr] of preds.entries()) { items.push(pr); cols.push(pr.ap === 1 ? 'minmax(24px,1fr)' : 'minmax(24px,1fr) minmax(24px,1fr)'); if (corr && ix + 1 === corr) { items.push({ cor: true }); cols.push('22px'); } }
+    let g = `<div class="fgrid" style="grid-template-columns:${cols.join(' ')}">`;
+    g += `<div></div>` + items.map(it => it.cor ? `<div></div>` : `<div class="h" style="grid-column:span ${it.ap}">${pad(it.p, 3)}</div>`).join('');
+    for (let n = maxN; n >= 1; n--) {
+      g += `<div class="l">N${n}</div>`;
+      for (const it of items) {
+        if (it.cor) { g += n === maxN ? `<div class="cor" style="grid-row:span ${maxN}"><span>CORREDOR</span></div>` : ''; continue; }
+        for (let a = 1; a <= it.ap; a++) {
+          if (n > it.n) { g += `<div class="nolvl"></div>`; continue; }
+          const code = `${pad(R.rua, 2)}-${F.tag ? F.tag + '-' : ''}${pad(it.p, 3)}-${n}-${pad(a, 2)}`, inf = addrInfo(st, code);
+          g += `<button class="ap s-${inf.st}${UI.sel === code ? ' sel' : ''}" data-act="addr" data-c="${code}" title="${code}${inf.L.length ? ' · ' + inf.L.length + ' produto(s)' : ''}" aria-label="${code}">${inf.L.length > 1 ? inf.L.length : ''}</button>`;
+        }
+      }
+    }
+    if (F.base) g += `<div class="l"></div><div class="base" style="grid-column:2/-1">BASE DE VAREJO · sem endereço de armazenagem</div>`;
+    g += `</div>`;
+    h += `<div class="face"><h4>${R.faces.length > 1 ? 'Lado ' + esc(F.face) : 'Face ' + esc(F.face)} <span class="chip">${F.preds.length} prédios</span>${R.rtl ? '<span class="chip">prédio 1 à direita (entrada)</span>' : '<span class="chip">prédio 1 à esquerda (entrada)</span>'}</h4><div class="fscroll">${g}</div></div>`;
+  }
+  return h;
+};
+
+function filteredAddrs() {
+  const st = site(), f = UI.fl, q = f.q.trim().toLowerCase(), qd = f.q.replace(/\D/g, '');
+  let L = ADDR[st].list;
+  if (f.rua) L = L.filter(a => a.rua === +f.rua);
+  if (q) {
+    const pidMatch = new Set(S.prod.filter(p => (p.cod + ' ' + (p.ean || '') + ' ' + p.desc).toLowerCase().includes(q)).map(p => p.id));
+    L = L.filter(a => a.code.includes(q) || (qd.length >= 2 && a.code.replace(/-/g, '').includes(qd)) || ((S.stock[st][a.code] || []).some(l => pidMatch.has(l.pid))));
+  }
+  if (f.st) L = L.filter(a => { const i = addrInfo(st, a.code).st; return f.st === 'alerta' ? (i === 'avencer' || i === 'vencido') : f.st === 'ocupado' ? i !== 'vazio' : i === f.st; });
+  return L;
+}
+VIEWS.end = () => {
+  const st = site(), L = filteredAddrs(), f = UI.fl;
+  let h = `<h1 class="pt">Endereços · ${SITES[st]}</h1><p class="sub">Pesquise por endereço (ex.: 03-012-2-01), código, EAN ou descrição do produto.</p>`;
+  h += `<div class="card no-print" style="margin-bottom:12px"><div class="fg c3"><div><label class="f">Busca</label><input class="in" id="fl-q" value="${esc(f.q)}" placeholder="Endereço, código, EAN ou produto" autocomplete="off"></div>
+   <div><label class="f">Rua</label><select class="in" id="fl-rua"><option value="">Todas</option>${ADDR[st].struct.map(r => `<option value="${r.rua}" ${f.rua == r.rua ? 'selected' : ''}>Rua ${pad(r.rua, 2)}${r.nome ? ' · ' + esc(r.nome) : ''}</option>`).join('')}</select></div>
+   <div><label class="f">Situação</label><select class="in" id="fl-st">${[['', 'Todas'], ['ocupado', 'Ocupados'], ['vazio', 'Vazios'], ['alerta', 'Com alerta de validade'], ['vencido', 'Vencidos']].map(o => `<option value="${o[0]}" ${f.st === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div></div></div>`;
+  h += `<div class="row sp" style="margin-bottom:8px"><span class="hint"><b>${fmtN(L.length)}</b> endereço(s)</span><button class="btn sm no-print" data-act="exp-end">Exportar CSV</button></div>`;
+  if (!L.length) return h + emptyBox('Nenhum endereço encontrado com esses filtros.');
+  h += `<div class="list">${L.slice(0, UI.lim).map(a => {
+    const inf = addrInfo(st, a.code), tot = lineQ(inf.L);
+    const sub = inf.L.length ? inf.L.slice(0, 2).map(l => esc((P(l.pid) || {}).desc || '?')).join(' · ') + (inf.L.length > 2 ? ` · +${inf.L.length - 2}` : '') : 'Vazio';
+    return `<button class="li" data-act="addr" data-c="${a.code}"><div style="min-width:0"><b class="mono" style="font-size:15px">${a.code}</b> <span class="hint">Rua ${pad(a.rua, 2)} · Prédio ${pad(a.p, 3)} · N${a.n} · Apto ${pad(a.a, 2)}</span><div class="hint" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div></div><div style="text-align:right">${inf.st === 'vazio' ? '<span class="chip">Vazio</span>' : inf.st === 'vencido' ? '<span class="chip bad">Vencido</span>' : inf.st === 'avencer' ? '<span class="chip warn">A vencer</span>' : `<span class="chip y">${inf.L.length} prod · ${fmtN(tot)} un</span>`}</div></button>`;
+  }).join('')}</div>`;
+  if (L.length > UI.lim) h += `<div style="text-align:center;margin-top:12px"><button class="btn" data-act="more">Mostrar mais (${fmtN(L.length - UI.lim)} restantes)</button></div>`;
+  return h;
+};
+
+VIEWS.prod = () => {
+  const q = UI.pq.trim().toLowerCase(), st = site(), by = stats(st).byProd;
+  let L = S.prod.filter(p => !q || (p.cod + ' ' + (p.ean || '') + ' ' + p.desc + ' ' + (p.cat || '')).toLowerCase().includes(q));
+  L.sort((a, b) => a.desc.localeCompare(b.desc, 'pt-BR'));
+  let h = `<div class="row sp"><div><h1 class="pt">Produtos</h1><p class="sub">Cadastro único, compartilhado entre Depósito e Loja. Um apartamento pode armazenar vários produtos.</p></div><div class="row"><button class="btn" data-act="imp-prod">Importar base (Excel/CSV)</button><button class="btn" data-act="tpl-prod">Modelo</button><button class="btn p" data-act="prod-new">+ Novo produto</button></div></div><input type="file" id="f-prod" accept=".csv,.xlsx,.xlsm,text/csv,.txt" hidden>`;
+  h += `<div class="card" style="margin-bottom:12px"><input class="in" id="pq" value="${esc(UI.pq)}" placeholder="Buscar código, EAN ou descrição" autocomplete="off"></div>`;
+  if (!L.length) return h + emptyBox(S.prod.length ? 'Nenhum produto encontrado.' : 'Nenhum produto cadastrado.', S.prod.length ? '' : '<button class="btn p" data-act="prod-new">Cadastrar primeiro produto</button>');
+  h += `<div class="tw"><table class="t"><tr><th>Código</th><th>Produto</th><th>Categoria</th><th>Un</th><th style="text-align:right">Estoque (${SITES[st]})</th><th></th></tr>${L.map(p => { const q2 = by[p.id] || 0; return `<tr style="cursor:pointer" data-act="prod" data-id="${p.id}"><td class="mono">${esc(p.cod)}</td><td><b>${esc(p.desc)}</b>${p.ean ? `<div class="hint mono">EAN ${esc(p.ean)}</div>` : ''}</td><td>${esc(p.cat || '')}</td><td>${esc(p.un || '')}</td><td style="text-align:right"><b>${fmtN(q2)}</b></td><td><button class="btn sm" data-act="prod-edit" data-id="${p.id}">Editar</button></td></tr>`; }).join('')}</table></div>`;
+  return h;
+};
+
+/* ---- Movimentar ---- */
+function mvFormHtml() {
+  const m = UI.mv, st = site(); const t = m.tipo;
+  const needO = t !== 'ENTRADA', needD = t === 'ENTRADA' || t === 'TRANSF';
+  const orig = needO ? parseAddr(st, m.orig) : null, dest = needD ? parseAddr(st, m.dest) : null;
+  let h = `<div class="seg light" style="margin-bottom:14px;flex-wrap:wrap">${['ENTRADA', 'SAIDA', 'TRANSF', 'AJUSTE'].map(x => `<button class="${t === x ? 'on' : ''}" data-act="mvtipo" data-t="${x}">${tipoNome(x)}</button>`).join('')}</div>`;
+  const hints = { ENTRADA: 'Guardar produto em um apartamento. Vários produtos podem ficar no mesmo palete: registre um por vez no mesmo endereço (o destino é mantido). Mesmo produto, validade e lote soma o saldo.', SAIDA: 'Baixar produto de um apartamento. Sem escolher a linha, a baixa segue FEFO (vence primeiro, sai primeiro).', TRANSF: 'Mover produto entre apartamentos. Validade e lote acompanham o produto.', AJUSTE: 'Corrigir o saldo após contagem física. A diferença fica registrada.' };
+  h += `<p class="hint" style="margin:0 0 12px">${hints[t]}</p><div class="fg c2">`;
+  if (needO) {
+    h += `<div><label class="f">Endereço de origem</label><div class="row" style="flex-wrap:nowrap"><input class="in mono" id="mv-orig" value="${esc(m.orig)}" placeholder="03-012-2-01" inputmode="numeric" autocomplete="off">${('BarcodeDetector' in window) ? '<button class="btn" type="button" data-act="scan" data-f="mv-orig" title="Ler com a câmera">Ler</button>' : ''}</div>${m.orig && !orig ? '<div class="err">Endereço inexistente nesta unidade.</div>' : ''}</div>`;
+  }
+  if (needD) {
+    h += `<div><label class="f">Endereço de destino</label><div class="row" style="flex-wrap:nowrap"><input class="in mono" id="mv-dest" value="${esc(m.dest)}" placeholder="03-012-2-01" inputmode="numeric" autocomplete="off">${('BarcodeDetector' in window) ? '<button class="btn" type="button" data-act="scan" data-f="mv-dest">Ler</button>' : ''}</div>${m.dest && !dest ? '<div class="err">Endereço inexistente nesta unidade.</div>' : ''}</div>`;
+  }
+  h += `</div>`;
+  if (t === 'ENTRADA' && dest) {
+    const LD = S.stock[st][dest] || [];
+    h += `<div style="margin-top:12px"><label class="f">Já neste endereço (${LD.length} produto${LD.length === 1 ? '' : 's'})</label>${LD.length ? LD.map(l => { const p = P(l.pid) || {}; return `<div class="hint">• <b>${esc(p.desc || '?')}</b> · ${fmtN(l.q)} ${esc(p.un || 'un')}${l.val ? ' · val ' + fmtD(l.val) : ''}</div>`; }).join('') : '<div class="hint">Endereço vazio.</div>'}</div>`;
+  }
+  if (needO) {
+    const L = orig ? (S.stock[st][orig] || []) : [];
+    h += `<div style="margin-top:12px"><label class="f">Conteúdo do endereço de origem</label>`;
+    if (!orig) h += `<div class="hint">Informe um endereço válido para listar os produtos.</div>`;
+    else if (!L.length) h += `<div class="chip">Endereço vazio</div>`;
+    else h += L.map((l, i) => { const p = P(l.pid) || {}; return `<label class="rad"><input type="radio" name="mv-ln" value="${i}" ${String(m.idx) === String(i) ? 'checked' : ''}><div style="flex:1"><div class="nm"><b>${esc(p.desc || '?')}</b></div><div class="hint">Cód. ${esc(p.cod || '')} · saldo <b>${fmtN(l.q)}</b> ${esc(p.un || 'un')}${l.lote ? ' · lote ' + esc(l.lote) : ''}</div></div>${valChip(l.val)}</label>`; }).join('');
+    h += `</div>`;
+  }
+  if (t === 'ENTRADA') {
+    const p = P(m.pid);
+    h += `<div style="margin-top:12px"><label class="f">Produto</label><div class="row" style="flex-wrap:nowrap"><input class="in" id="mv-prod" placeholder="Código, EAN ou descrição" autocomplete="off" value="${p ? esc(p.desc) : ''}">${('BarcodeDetector' in window) ? '<button class="btn" type="button" data-act="scan" data-f="mv-prod">Ler</button>' : ''}</div><div id="mv-sug"></div>${p ? `<div class="hint" style="margin-top:4px">Selecionado: <b>${esc(p.desc)}</b> · cód. ${esc(p.cod)} · ${esc(p.un || 'UN')}</div>` : ''}</div>`;
+  }
+  h += `<div class="fg c3" style="margin-top:12px">`;
+  h += `<div><label class="f">${t === 'AJUSTE' ? 'Nova quantidade' : 'Quantidade'}</label><input class="in" id="mv-q" type="number" inputmode="decimal" min="0" step="any" value="${esc(m.q)}"></div>`;
+  if (t === 'ENTRADA') h += `<div><label class="f">Validade (opcional)</label><input class="in" id="mv-val" type="date" value="${esc(m.val)}"></div><div><label class="f">Lote (opcional)</label><input class="in" id="mv-lote" value="${esc(m.lote)}"></div>`;
+  h += `</div><div style="margin-top:12px"><label class="f">Observação (opcional)</label><input class="in" id="mv-obs" value="${esc(m.obs)}"></div>`;
+  h += `<div class="row" style="margin-top:16px"><button class="btn p" data-act="mvgo">Registrar ${tipoNome(t).toLowerCase()}</button><button class="btn" data-act="mvclear">Limpar</button></div><div id="mv-err" class="err" style="margin-top:8px"></div>`;
+  return h;
+}
+VIEWS.mover = () => {
+  const st = site(), mv = S.mov.filter(m => m.site === st).slice(-6).reverse();
+  return `<h1 class="pt">Movimentar · ${SITES[st]}</h1><p class="sub">Entradas, saídas, transferências e ajustes, com histórico completo.</p>
+  <div class="grid two"><div class="card" id="mvform">${mvFormHtml()}</div>
+  <div class="card" style="align-self:start"><h3>Últimos registros</h3>${mv.length ? `<div class="list">${mv.map(m => `<div class="li"><div><span class="chip ${m.tipo === 'ENTRADA' ? 'ok' : m.tipo === 'SAIDA' ? 'bad' : m.tipo === 'TRANSF' ? 'y' : 'n'}">${tipoNome(m.tipo)}</span> <b>${esc((P(m.pid) || {}).desc || '?')}</b><div class="hint">${fmtTs(m.ts)} · ${m.orig || ''}${m.orig && m.dest ? ' → ' : ''}${m.dest || ''}</div></div><b>${m.q > 0 && m.tipo === 'AJUSTE' ? '+' : ''}${fmtN(m.q)}</b></div>`).join('')}</div>` : emptyBox('Nada registrado ainda.')}</div></div>`;
+};
+function syncMv() {
+  const m = UI.mv, g = id => { const e = $('#' + id); return e ? e.value : null; };
+  for (const [id, k] of [['mv-orig', 'orig'], ['mv-dest', 'dest'], ['mv-q', 'q'], ['mv-val', 'val'], ['mv-lote', 'lote'], ['mv-obs', 'obs']]) { const v = g(id); if (v !== null) m[k] = v; }
+  const r = $('input[name="mv-ln"]:checked'); if (r) m.idx = +r.value;
+}
+function mvRefresh(focusId) { const f = $('#mvform'); if (!f) return; f.innerHTML = mvFormHtml(); if (focusId) { const e = $('#' + focusId); if (e) { e.focus(); const v = e.value; e.value = ''; e.value = v; } } }
+function mvGo() {
+  syncMv(); const m = UI.mv, st = site(), t = m.tipo, q = parseFloat(String(m.q).replace(',', '.'));
+  const orig = parseAddr(st, m.orig), dest = parseAddr(st, m.dest); let r;
+  if (t === 'ENTRADA') r = opEntrada({ site: st, dest, pid: m.pid, q, val: m.val, lote: m.lote.trim(), obs: m.obs });
+  else if (t === 'SAIDA') r = m.idx == null ? { err: 'Selecione a linha de estoque.' } : opSaida({ site: st, orig, idx: m.idx, q, obs: m.obs });
+  else if (t === 'TRANSF') r = m.idx == null ? { err: 'Selecione a linha de estoque.' } : opTransf({ site: st, orig, dest, idx: m.idx, q, obs: m.obs });
+  else r = m.idx == null ? { err: 'Selecione a linha de estoque.' } : opAjuste({ site: st, orig, idx: m.idx, q, obs: m.obs });
+  if (r.err) { const e = $('#mv-err'); if (e) e.textContent = r.err; toast(r.err, 'bad'); return; }
+  toast(tipoNome(t) + ' registrada com sucesso.', 'ok');
+  const keepT = m.tipo; UI.mv = { tipo: keepT, orig: t === 'ENTRADA' ? '' : m.orig, dest: m.dest, pid: null, idx: null, q: '', val: '', lote: '', obs: '' };
+  if (t === 'ENTRADA') { UI.mv.orig = ''; toast('Pode incluir outro produto no mesmo endereço.', ''); }
+  render();
+}
+
+/* ---- Relatórios ---- */
+function relMov() {
+  const st = site(), f = UI.rf, q = f.q.trim().toLowerCase();
+  return S.mov.filter(m => m.site === st).filter(m => (!f.de || m.ts.slice(0, 10) >= f.de) && (!f.ate || m.ts.slice(0, 10) <= f.ate) && (!f.tipo || m.tipo === f.tipo) && (!q || ((P(m.pid) || {}).desc + ' ' + (P(m.pid) || {}).cod + ' ' + (m.orig || '') + ' ' + (m.dest || '')).toLowerCase().includes(q))).reverse();
+}
+function stockRows() {
+  const st = site(), out = [];
+  for (const a of ADDR[st].list) for (const l of (S.stock[st][a.code] || [])) out.push({ code: a.code, l, p: P(l.pid) || {} });
+  return out;
+}
+VIEWS.rel = () => {
+  const st = site(), f = UI.rf;
+  let h = `<div class="row sp"><div><h1 class="pt">Relatórios · ${LOJA_NOME(S.cfg.loja)} · ${SITES[st]}</h1><p class="sub">Histórico, validade, ocupação e posição de estoque. Use “Imprimir” para salvar em PDF.</p></div><button class="btn no-print" data-act="print">Imprimir / PDF</button></div>`;
+  h += `<div class="chips no-print">${[['mov', 'Movimentações'], ['val', 'Validade'], ['ocup', 'Ocupação'], ['est', 'Posição de estoque']].map(x => `<button class="${UI.rep === x[0] ? 'on' : ''}" data-act="rep" data-r="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+  if (UI.rep === 'mov') {
+    const L = relMov();
+    h += `<div class="card no-print" style="margin-bottom:12px"><div class="fg c4"><div><label class="f">De</label><input class="in" type="date" id="rf-de" value="${f.de}"></div><div><label class="f">Até</label><input class="in" type="date" id="rf-ate" value="${f.ate}"></div><div><label class="f">Tipo</label><select class="in" id="rf-tipo"><option value="">Todos</option>${['ENTRADA', 'SAIDA', 'TRANSF', 'AJUSTE'].map(x => `<option value="${x}" ${f.tipo === x ? 'selected' : ''}>${tipoNome(x)}</option>`).join('')}</select></div><div><label class="f">Busca</label><input class="in" id="rf-q" value="${esc(f.q)}" placeholder="Produto ou endereço"></div></div></div>`;
+    h += `<div class="row sp" style="margin-bottom:8px"><span class="hint"><b>${fmtN(L.length)}</b> registro(s)</span><button class="btn sm no-print" data-act="exp-mov">Exportar CSV</button></div>`;
+    h += L.length ? `<div class="tw"><table class="t"><tr><th>Data/hora</th><th>Tipo</th><th>Produto</th><th style="text-align:right">Qtd</th><th>Origem</th><th>Destino</th><th>Val./Lote</th><th>Operador</th></tr>${L.slice(0, 500).map(m => `<tr><td>${fmtTs(m.ts)}</td><td><span class="chip ${m.tipo === 'ENTRADA' ? 'ok' : m.tipo === 'SAIDA' ? 'bad' : m.tipo === 'TRANSF' ? 'y' : 'n'}">${tipoNome(m.tipo)}</span></td><td><b>${esc((P(m.pid) || {}).desc || '?')}</b></td><td style="text-align:right"><b>${m.tipo === 'AJUSTE' && m.q > 0 ? '+' : ''}${fmtN(m.q)}</b></td><td class="mono">${m.orig ? `<a href="#" data-act="plant" data-c="${m.orig}">${m.orig}</a>` : '—'}</td><td class="mono">${m.dest ? `<a href="#" data-act="plant" data-c="${m.dest}">${m.dest}</a>` : '—'}</td><td>${fmtD(m.val)}${m.lote ? ' · ' + esc(m.lote) : ''}</td><td>${esc(m.op || '')}</td></tr>`).join('')}</table></div>${L.length > 500 ? '<p class="hint">Mostrando os 500 mais recentes. Exporte o CSV para ver tudo.</p>' : ''}` : emptyBox('Nenhuma movimentação no período.');
+  } else if (UI.rep === 'val') {
+    const rows = stockRows().filter(x => x.l.val).map(x => ({ ...x, d: daysTo(x.l.val) })).filter(x => !f.d || (f.d === 'v' ? x.d < 0 : x.d <= +f.d)).sort((a, b) => a.d - b.d);
+    h += `<div class="card no-print" style="margin-bottom:12px"><label class="f">Filtro</label><select class="in" id="rf-d" style="max-width:280px">${[['', 'Todos com validade'], ['v', 'Somente vencidos'], ['30', 'Vencidos + a vencer em 30 dias'], ['60', 'Até 60 dias'], ['90', 'Até 90 dias']].map(o => `<option value="${o[0]}" ${f.d === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>`;
+    h += rows.length ? `<div class="tw"><table class="t"><tr><th>Endereço</th><th>Produto</th><th style="text-align:right">Qtd</th><th>Lote</th><th>Validade</th><th>Situação</th></tr>${rows.slice(0, 600).map(x => `<tr style="cursor:pointer" data-act="addr" data-c="${x.code}"><td class="mono"><b>${x.code}</b></td><td>${esc(x.p.desc || '?')}</td><td style="text-align:right">${fmtN(x.l.q)}</td><td>${esc(x.l.lote || '—')}</td><td>${fmtD(x.l.val)}</td><td>${valChip(x.l.val)}</td></tr>`).join('')}</table></div>` : emptyBox('Nenhum item encontrado.');
+  } else if (UI.rep === 'ocup') {
+    const s = stats(st);
+    h += `<div class="tw"><table class="t"><tr><th>Rua</th><th style="text-align:right">Endereços</th><th style="text-align:right">Ocupados</th><th style="text-align:right">Vazios</th><th style="text-align:right">Ocupação</th><th style="text-align:right">Produtos</th><th style="text-align:right">Unidades</th></tr>${Object.keys(s.byRua).map(r => { const x = s.byRua[r], nome = (ADDR[st].struct.find(q => q.rua == r) || {}).nome; return `<tr><td><b>Rua ${pad(r, 2)}</b>${nome ? ' · ' + esc(nome) : ''}</td><td style="text-align:right">${fmtN(x.tot)}</td><td style="text-align:right">${fmtN(x.occ)}</td><td style="text-align:right">${fmtN(x.tot - x.occ)}</td><td style="text-align:right"><b>${x.tot ? (x.occ / x.tot * 100).toFixed(1).replace('.', ',') : 0}%</b></td><td style="text-align:right">${fmtN(x.skus.size)}</td><td style="text-align:right">${fmtN(x.units)}</td></tr>`; }).join('')}<tr style="background:#FFF6D6"><td><b>Total</b></td><td style="text-align:right"><b>${fmtN(s.tot)}</b></td><td style="text-align:right"><b>${fmtN(s.occ)}</b></td><td style="text-align:right"><b>${fmtN(s.vazio)}</b></td><td style="text-align:right"><b>${s.pct.toFixed(1).replace('.', ',')}%</b></td><td style="text-align:right"><b>${fmtN(s.skus)}</b></td><td style="text-align:right"><b>${fmtN(s.units)}</b></td></tr></table></div>`;
+  } else {
+    const rows = stockRows();
+    h += `<div class="row sp" style="margin-bottom:8px"><span class="hint"><b>${fmtN(rows.length)}</b> linha(s) de estoque</span><button class="btn sm no-print" data-act="exp-est">Exportar CSV</button></div>`;
+    h += rows.length ? `<div class="tw"><table class="t"><tr><th>Endereço</th><th>Código</th><th>Produto</th><th style="text-align:right">Qtd</th><th>Un</th><th>Validade</th><th>Lote</th></tr>${rows.slice(0, 600).map(x => `<tr><td class="mono"><b>${x.code}</b></td><td class="mono">${esc(x.p.cod || '')}</td><td>${esc(x.p.desc || '?')}</td><td style="text-align:right">${fmtN(x.l.q)}</td><td>${esc(x.p.un || '')}</td><td>${fmtD(x.l.val)}</td><td>${esc(x.l.lote || '')}</td></tr>`).join('')}</table></div>${rows.length > 600 ? '<p class="hint">Mostrando as 600 primeiras linhas. Exporte o CSV para ver tudo.</p>' : ''}` : emptyBox('Sem estoque lançado.');
+  }
+  return h;
+};
+
+/* ---- Etiquetas ---- */
+function labelAddrs() {
+  const st = site(), b = UI.lb; let L = ADDR[st].list.filter(a => a.rua === +b.rua);
+  if (b.face) L = L.filter(a => a.face === b.face);
+  L = L.filter(a => a.p >= +b.p1 && a.p <= +b.p2 && (!b.niv || a.n === +b.niv));
+  return L.sort((x, y) => x.p - y.p || x.n - y.n || x.a - y.a);
+}
+function labelHtml(a) { const st = site(); return `<div class="lab"><div class="lh"><span>Nilo ${esc(LOJA_NOME(S.cfg.loja))} · ${SITES[st]}</span><span>Rua ${pad(a.rua, 2)}</span></div><div class="lc">${a.code}</div><div class="lbar">${code39(a.code)}</div><div class="lm"><span>Rua ${pad(a.rua, 2)}</span><span>Prédio ${pad(a.p, 3)}</span><span>Nível ${a.n}</span><span>Apto ${pad(a.a, 2)}</span></div></div>`; }
+VIEWS.etq = () => {
+  const st = site(), b = UI.lb; const R = ADDR[st].struct.find(x => x.rua === +b.rua) || ADDR[st].struct[0];
+  const L = labelAddrs();
+  let h = `<h1 class="pt">Etiquetas · ${SITES[st]}</h1><p class="sub">Etiquetas de endereço com código de barras (Code 39), prontas para imprimir e colar na viga. Leitores de código de barras comuns reconhecem o formato.</p>`;
+  h += `<div class="card no-print" style="margin-bottom:12px"><div class="fg c4"><div><label class="f">Rua</label><select class="in" id="lb-rua">${ADDR[st].struct.map(r => `<option value="${r.rua}" ${+b.rua === r.rua ? 'selected' : ''}>Rua ${pad(r.rua, 2)}${r.nome ? ' · ' + esc(r.nome) : ''}</option>`).join('')}</select></div>
+  <div><label class="f">Face</label><select class="in" id="lb-face"><option value="">Todas</option>${[...new Set(R.faces.map(f => f.face))].map(f => `<option value="${esc(f)}" ${b.face === f ? 'selected' : ''}>${esc(f)}</option>`).join('')}</select></div>
+  <div><label class="f">Prédio de</label><input class="in" id="lb-p1" type="number" min="1" value="${b.p1}"></div><div><label class="f">Prédio até</label><input class="in" id="lb-p2" type="number" min="1" value="${b.p2}"></div>
+  <div><label class="f">Nível</label><select class="in" id="lb-niv"><option value="">Todos</option>${seq(1, 5).map(n => `<option value="${n}" ${+b.niv === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+  <div><label class="f">Colunas por página</label><select class="in" id="lb-cols">${[2, 3].map(n => `<option ${+b.cols === n ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>
+  <div class="row" style="margin-top:12px"><button class="btn p" data-act="lb-print" ${L.length ? '' : 'disabled'}>Imprimir ${fmtN(L.length)} etiqueta(s)</button><span class="hint">Dica: na janela de impressão escolha “Salvar como PDF” para gerar o arquivo.</span></div></div>`;
+  h += L.length ? `<div class="labs ${+b.cols === 3 ? 'cols3' : ''}" style="--cols:${b.cols}">${L.slice(0, 12).map(labelHtml).join('')}</div>${L.length > 12 ? `<p class="hint">Prévia das 12 primeiras de ${fmtN(L.length)}.</p>` : ''}` : emptyBox('Nenhum endereço no intervalo escolhido.');
+  return h;
+};
+
+/* ---- Configurações ---- */
+const APPS_SCRIPT = "/**\n * NILO WMS · ENDEREÇAMENTO  —  Back-end (Google Apps Script + Google Sheets)\n * Rede Nilo Supermercados · multiloja\n *\n * COMO INSTALAR\n * 1. Crie uma planilha no Google Planilhas (ex.: \"Nilo WMS - Endereçamento\").\n * 2. Extensões > Apps Script. Apague o conteúdo e cole este arquivo inteiro. Salve.\n * 3. (Opcional) Defina uma senha em TOKEN abaixo e use a mesma no aplicativo.\n * 4. Execute uma vez a função  prepararPlanilha  (autorize o acesso quando pedir).\n * 5. Implantar > Nova implantação > tipo \"Aplicativo da Web\":\n *      Executar como: Eu   |   Quem pode acessar: Qualquer pessoa\n * 6. Copie a URL terminada em /exec e cole em Configurações > Nuvem (Google Planilhas) no aplicativo.\n * Ao alterar este código, use Implantar > Gerenciar implantações > Editar > Nova versão.\n *\n * ABAS CRIADAS\n *   Lojas | Produtos (cadastro único da rede) | Estoque (1 linha por produto/validade em cada endereço)\n *   Movimentacoes (histórico: entrada, saída, transferência, ajuste)\n *\n * REGRAS\n *  - Produtos: compartilhados entre todas as lojas (chave = id).\n *  - Estoque e movimentações: separados por loja e por setor (Depósito / Loja).\n *  - A gravação é por endereço (se dois aparelhos mexerem no mesmo endereço ao mesmo tempo, vale o último envio).\n *  - Excluir produto no app apenas marca ativo = NAO na planilha (preserva o histórico).\n */\n\nvar TOKEN = ''; // opcional: se preencher, o app precisa enviar o mesmo valor (Configurações > Nuvem > Senha)\n\nvar LOJAS = [\n  ['SHO', 'Shopping BG'],\n  ['MAT', 'Matriz'],\n  ['NXV', 'Nova Xavantina'],\n  ['QUE', 'Querência'],\n  ['AGB', 'Água Boa'],\n  ['JUS', 'Jussara'],\n  ['CAN', 'Canarana']\n];\n\nvar ABAS = {\n  lojas: { nome: 'Lojas', cab: ['id', 'loja', 'ultima_sincronizacao', 'aparelho', 'operador'], texto: [1, 2] },\n  prod: { nome: 'Produtos', cab: ['id', 'codigo', 'ean', 'descricao', 'un', 'categoria', 'estoque_min', 'ativo', 'atualizado'], texto: [1, 2, 3, 4, 5] },\n  est: { nome: 'Estoque', cab: ['loja', 'setor', 'endereco', 'pid', 'codigo', 'descricao', 'qtd', 'validade', 'lote', 'entrada', 'atualizado'], texto: [1, 2, 3, 4, 5, 6, 8, 9, 10] },\n  mov: { nome: 'Movimentacoes', cab: ['uid', 'data_hora', 'loja', 'setor', 'tipo', 'codigo', 'descricao', 'qtd', 'origem', 'destino', 'validade', 'lote', 'operador', 'obs', 'pid'], texto: [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14] }\n};\n\n/* ---------------------------- entrada HTTP ---------------------------- */\n\nfunction doGet(e) {\n  return saida_(tratar_(e && e.parameter ? e.parameter : {}));\n}\n\nfunction doPost(e) {\n  var corpo = {};\n  try { corpo = JSON.parse(e.postData.contents); } catch (err) { return saida_({ ok: false, erro: 'JSON inválido' }); }\n  return saida_(tratar_(corpo));\n}\n\nfunction saida_(obj) {\n  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction tratar_(p) {\n  try {\n    if (TOKEN && String(p.token || '') !== TOKEN) return { ok: false, erro: 'Senha incorreta.' };\n    var acao = p.action || '';\n    if (!acao && p.type) return { ok: true, legado: true }; // compatibilidade com a versão antiga do app\n    if (acao === 'ping') { prepararPlanilha(); return { ok: true, hora: agora_(), lojas: LOJAS }; }\n    if (acao === 'pull') return puxar_(p);\n    if (acao === 'push') return gravar_(p);\n    return { ok: false, erro: 'Ação desconhecida: ' + acao };\n  } catch (err) {\n    return { ok: false, erro: String(err && err.message ? err.message : err) };\n  }\n}\n\n/* ------------------------------ planilha ------------------------------ */\n\nfunction onOpen() {\n  SpreadsheetApp.getUi().createMenu('Nilo WMS').addItem('Preparar planilha', 'prepararPlanilha').addToUi();\n}\n\nfunction prepararPlanilha() {\n  var ss = SpreadsheetApp.getActive();\n  Object.keys(ABAS).forEach(function (k) {\n    var a = ABAS[k];\n    var sh = ss.getSheetByName(a.nome);\n    if (!sh) sh = ss.insertSheet(a.nome);\n    if (sh.getRange(1, 1).getValue() !== a.cab[0]) {\n      sh.getRange(1, 1, 1, a.cab.length).setValues([a.cab]).setFontWeight('bold').setBackground('#1B2A4A').setFontColor('#FFC400');\n      sh.setFrozenRows(1);\n      a.texto.forEach(function (c) { sh.getRange(1, c, sh.getMaxRows(), 1).setNumberFormat('@'); });\n    }\n  });\n  var sl = ss.getSheetByName(ABAS.lojas.nome);\n  if (sl.getLastRow() < 2) {\n    sl.getRange(2, 1, LOJAS.length, 2).setValues(LOJAS);\n  }\n  var padrao = ss.getSheetByName('Planilha1') || ss.getSheetByName('Sheet1');\n  if (padrao && ss.getSheets().length > 1 && padrao.getLastRow() === 0) ss.deleteSheet(padrao);\n}\n\nfunction aba_(k) {\n  var sh = SpreadsheetApp.getActive().getSheetByName(ABAS[k].nome);\n  if (!sh) { prepararPlanilha(); sh = SpreadsheetApp.getActive().getSheetByName(ABAS[k].nome); }\n  return sh;\n}\n\nfunction ler_(k) {\n  var sh = aba_(k), n = sh.getLastRow();\n  if (n < 2) return [];\n  return sh.getRange(2, 1, n - 1, ABAS[k].cab.length).getValues();\n}\n\nfunction reescrever_(k, linhas) {\n  var sh = aba_(k), cols = ABAS[k].cab.length, n = sh.getLastRow();\n  if (n > 1) sh.getRange(2, 1, n - 1, cols).clearContent();\n  if (!linhas.length) return;\n  if (sh.getMaxRows() < linhas.length + 1) sh.insertRowsAfter(sh.getMaxRows(), linhas.length + 1 - sh.getMaxRows());\n  sh.getRange(2, 1, linhas.length, cols).setValues(linhas);\n}\n\nfunction agora_() {\n  return Utilities.formatDate(new Date(), 'America/Sao_Paulo', \"yyyy-MM-dd'T'HH:mm:ss\");\n}\n\nfunction txt_(v) {\n  if (v instanceof Date) return Utilities.formatDate(v, 'America/Sao_Paulo', 'yyyy-MM-dd');\n  return v === null || v === undefined ? '' : String(v);\n}\n\nfunction num_(v) {\n  var n = Number(v);\n  return isNaN(n) ? 0 : n;\n}\n\n/* ------------------------------- leitura ------------------------------ */\n\nfunction puxar_(p) {\n  var loja = String(p.loja || '');\n  var prod = [], excluidos = [];\n  ler_('prod').forEach(function (r) {\n    if (r[0] === '' || r[0] === null) return;\n    var id = num_(r[0]);\n    if (txt_(r[7]).toUpperCase() === 'NAO') { excluidos.push(id); return; }\n    prod.push({ id: id, cod: txt_(r[1]), ean: txt_(r[2]), desc: txt_(r[3]), un: txt_(r[4]) || 'UN', cat: txt_(r[5]), min: num_(r[6]) });\n  });\n\n  var est = { DEP: {}, LOJ: {} }, qtdEst = 0;\n  ler_('est').forEach(function (r) {\n    if (txt_(r[0]) !== loja) return;\n    var setor = txt_(r[1]), cod = txt_(r[2]);\n    if (!est[setor]) est[setor] = {};\n    if (!est[setor][cod]) est[setor][cod] = [];\n    est[setor][cod].push({ pid: num_(r[3]), q: num_(r[6]), val: txt_(r[7]), lote: txt_(r[8]), dt: txt_(r[9]) });\n    qtdEst++;\n  });\n\n  var cursor = Math.max(0, parseInt(p.movRow, 10) || 0);\n  var sh = aba_('mov'), ultima = sh.getLastRow(), mov = [];\n  if (ultima > 1) {\n    var ini = Math.max(2, cursor + 1);\n    if (!cursor && ultima > 5001) ini = ultima - 4999; // primeira carga: últimas 5000 linhas\n    if (ini <= ultima) {\n      sh.getRange(ini, 1, ultima - ini + 1, ABAS.mov.cab.length).getValues().forEach(function (r) {\n        if (txt_(r[2]) !== loja) return;\n        mov.push({ uid: txt_(r[0]), ts: txt_(r[1]), site: txt_(r[3]), tipo: txt_(r[4]), pid: num_(r[14]), q: num_(r[7]), orig: txt_(r[8]), dest: txt_(r[9]), val: txt_(r[10]), lote: txt_(r[11]), op: txt_(r[12]), obs: txt_(r[13]) });\n      });\n    }\n  }\n  var lojaTemDados = qtdEst > 0 || mov.length > 0 || cursor > 0;\n  return { ok: true, hora: agora_(), loja: loja, prod: prod, prodDel: excluidos, stock: est, mov: mov, movRow: ultima, temDadosLoja: lojaTemDados, temProdutos: prod.length > 0 };\n}\n\n/* ------------------------------- gravação ----------------------------- */\n\nfunction gravar_(p) {\n  var lock = LockService.getScriptLock();\n  lock.waitLock(25000);\n  try {\n    var loja = String(p.loja || '');\n    if (!loja) return { ok: false, erro: 'Loja não informada.' };\n    var agora = agora_();\n    var rel = { prod: 0, prodDel: 0, enderecos: 0, linhas: 0, mov: 0 };\n\n    // 1) Produtos (upsert por id) e exclusões lógicas\n    var prodUp = p.prod || [], prodDel = p.prodDel || [];\n    if (prodUp.length || prodDel.length) {\n      var linhasP = ler_('prod'), idx = {};\n      linhasP.forEach(function (r, i) { idx[String(num_(r[0]))] = i; });\n      prodUp.forEach(function (x) {\n        var linha = [x.id, x.cod || '', x.ean || '', x.desc || '', x.un || 'UN', x.cat || '', num_(x.min), 'SIM', agora];\n        var k = String(num_(x.id));\n        if (idx.hasOwnProperty(k)) linhasP[idx[k]] = linha; else { idx[k] = linhasP.length; linhasP.push(linha); }\n        rel.prod++;\n      });\n      prodDel.forEach(function (id) {\n        var k = String(num_(id));\n        if (idx.hasOwnProperty(k)) { linhasP[idx[k]][7] = 'NAO'; linhasP[idx[k]][8] = agora; rel.prodDel++; }\n      });\n      reescrever_('prod', linhasP);\n    }\n\n    // 2) Estoque por endereço (substitui as linhas do endereço)\n    var ends = p.stock || [];\n    if (ends.length) {\n      var mapaProd = {};\n      ler_('prod').forEach(function (r) { mapaProd[String(num_(r[0]))] = { cod: txt_(r[1]), desc: txt_(r[3]) }; });\n      var chaves = {};\n      ends.forEach(function (e) { chaves[loja + '|' + e.setor + '|' + e.code] = true; });\n      var mantidas = ler_('est').filter(function (r) { return !chaves[txt_(r[0]) + '|' + txt_(r[1]) + '|' + txt_(r[2])]; });\n      ends.forEach(function (e) {\n        rel.enderecos++;\n        (e.lines || []).forEach(function (l) {\n          var pr = mapaProd[String(num_(l.pid))] || { cod: '', desc: '' };\n          mantidas.push([loja, e.setor, e.code, l.pid, pr.cod, pr.desc, num_(l.q), l.val || '', l.lote || '', l.dt || '', agora]);\n          rel.linhas++;\n        });\n      });\n      reescrever_('est', mantidas);\n    }\n\n    // 3) Movimentações (somente acrescenta; ignora uid repetido)\n    var movs = p.mov || [];\n    if (movs.length) {\n      var sh = aba_('mov'), ult = sh.getLastRow(), uids = {};\n      if (ult > 1) sh.getRange(2, 1, ult - 1, 1).getValues().forEach(function (r) { uids[txt_(r[0])] = true; });\n      var novas = [];\n      movs.forEach(function (m) {\n        if (!m.uid || uids[m.uid]) return;\n        uids[m.uid] = true;\n        novas.push([m.uid, m.ts || agora, loja, m.setor || '', m.tipo || '', m.cod || '', m.desc || '', num_(m.q), m.orig || '', m.dest || '', m.val || '', m.lote || '', m.op || '', m.obs || '', num_(m.pid)]);\n      });\n      if (novas.length) {\n        if (sh.getMaxRows() < ult + novas.length) sh.insertRowsAfter(sh.getMaxRows(), ult + novas.length - sh.getMaxRows());\n        sh.getRange(ult + 1, 1, novas.length, ABAS.mov.cab.length).setValues(novas);\n        rel.mov = novas.length;\n      }\n    }\n\n    // 4) Carimbo de sincronização da loja\n    var sl = aba_('lojas'), dados = ler_('lojas'), achou = false;\n    for (var i = 0; i < dados.length; i++) {\n      if (txt_(dados[i][0]) === loja) { sl.getRange(i + 2, 3, 1, 3).setValues([[agora, p.dev || '', p.op || '']]); achou = true; break; }\n    }\n    if (!achou) sl.appendRow([loja, loja, agora, p.dev || '', p.op || '']);\n\n    return { ok: true, hora: agora, resumo: rel };\n  } finally {\n    lock.releaseLock();\n  }\n}\n";
+VIEWS.cfg = () => {
+  const c = S.cfg;
+  const nS = Object.keys(S.stock.DEP).length + Object.keys(S.stock.LOJ).length;
+  return `<h1 class="pt">Configurações</h1><p class="sub">Dados salvos neste aparelho (offline). Faça backup com frequência.</p>
+  <div class="grid two"><div class="grid" style="align-content:start">
+  <div class="card"><h3>Operador</h3><label class="f">Nome (registrado em cada movimentação)</label><input class="in" id="cf-op" value="${esc(c.op)}" placeholder="Seu nome"></div>
+  <div class="card"><h3>Nuvem · Google Planilhas <span class="sdot ${SY.st}" id="sdot2"></span></h3><p class="hint" style="margin-top:0">Tudo o que for lançado (produtos, estoque por endereço e histórico, separado por loja) é gravado automaticamente na planilha. Funciona offline: o que for feito sem internet é enviado quando a conexão voltar.</p>
+  <label class="f">URL do Web App (Apps Script)</label><input class="in" id="cf-hook" value="${esc(c.hook)}" placeholder="https://script.google.com/macros/s/…/exec">
+  <label class="f" style="margin-top:8px">Senha (opcional, igual ao TOKEN do script)</label><input class="in" id="cf-token" type="password" autocomplete="off" value="${esc(c.token || '')}">
+  <div class="row" style="margin-top:10px"><button class="btn d" data-act="cf-save">Salvar e conectar</button><button class="btn" data-act="sync-now" ${c.hook ? '' : 'disabled'}>Sincronizar agora</button><button class="btn" data-act="script">Ver código do Apps Script</button></div>
+  <p class="hint" id="sy-status">${esc(syText())}</p>
+  <div class="row"><button class="btn" data-act="cloud-down" ${c.hook ? '' : 'disabled'}>Baixar da nuvem (substitui esta loja neste aparelho)</button><button class="btn r" data-act="cloud-up" ${c.hook ? '' : 'disabled'}>Enviar este aparelho (sobrescreve a nuvem)</button></div></div>
+  <div class="card"><h3>Importar / exportar</h3><div class="row"><button class="btn" data-act="imp-prod">Subir base de produtos (Excel/CSV)</button><input type="file" id="f-prod" accept=".csv,.xlsx,.xlsm,text/csv,.txt" hidden><button class="btn" data-act="imp-csv">Importar estoque (Excel/CSV)</button><button class="btn" data-act="tpl-csv">Baixar modelo CSV</button><button class="btn" data-act="exp-prod">Exportar produtos</button></div>
+  <input type="file" id="f-csv" accept=".csv,.xlsx,.xlsm,text/csv" hidden><p class="hint">Aceita Excel (.xlsx, primeira aba) ou CSV (separador ponto e vírgula). Colunas: endereço; código; descrição; quantidade; validade; lote; unidade. Os produtos novos são cadastrados automaticamente. O arquivo é importado para a unidade selecionada (${SITES[site()]}).</p></div></div>
+  <div class="grid" style="align-content:start">
+  <div class="card"><h3>Backup e restauração</h3><div class="row"><button class="btn d" data-act="bk-exp">Baixar backup (JSON)</button><button class="btn" data-act="bk-imp">Restaurar backup</button></div><input type="file" id="f-bk" accept=".json,application/json" hidden><p class="hint">Contém produtos, estoque das duas unidades e todo o histórico (${fmtN(S.prod.length)} produtos · ${fmtN(nS)} endereços ocupados · ${fmtN(S.mov.length)} movimentações).</p></div>
+  <div class="card"><h3>Estrutura de endereços</h3><p class="hint" style="margin-top:0">Gerada a partir do documento de endereçamento aprovado.</p><div class="list">${Object.keys(SITES).map(s => `<div class="li"><div><b>${SITES[s]}</b><div class="hint">${ADDR[s].struct.length} ruas · ${new Set(ADDR[s].list.map(a => a.rua + a.face + a.p)).size} prédios</div></div><span class="chip n">${fmtN(ADDR[s].list.length)} endereços</span></div>`).join('')}</div></div>
+  <div class="card"><h3>Zona de risco</h3><p class="hint" style="margin-top:0">Zerar endereços: esvazia todos os apartamentos (Depósito e Loja) e o histórico de movimentações, <b>mantendo a base de produtos</b>.</p><div class="row"><button class="btn r" data-act="zerar-end">Zerar endereços (manter produtos)</button><button class="btn r" data-act="rm-demo">Remover produtos de demonstração</button><button class="btn r" data-act="min-zero">Zerar estoque mínimo</button></div><p class="hint">Apagar todos os dados remove também a base de produtos.</p><button class="btn r" data-act="reset">Apagar todos os dados</button></div></div></div>`;
+};
+
+/* ---------------- detalhes: endereço e produto ---------------- */
+function openAddr(code) {
+  const st = site(), a = ADDR[st].map.get(code); if (!a) return;
+  UI.sel = code; const inf = addrInfo(st, code);
+  const hist = S.mov.filter(m => m.site === st && (m.orig === code || m.dest === code)).slice(-6).reverse();
+  let h = `<div class="dh"><div><div class="hint" style="color:#cfd6e6">${SITES[st]} · endereço</div><div class="code mono">${code}</div><div class="row" style="margin-top:6px"><span class="chip y">Rua ${pad(a.rua, 2)}</span><span class="chip y">Prédio ${pad(a.p, 3)}</span><span class="chip y">Nível ${a.n}</span><span class="chip y">Apto ${pad(a.a, 2)}</span></div></div><button class="x" data-act="close" aria-label="Fechar">×</button></div><div class="db">`;
+  h += `<div class="row sp" style="margin-bottom:10px"><b style="color:var(--n)">Produtos neste apartamento (${inf.L.length})</b><button class="btn p sm" data-act="dr-in" data-c="${code}">+ Entrada</button></div>`;
+  h += inf.L.length ? inf.L.map((l, i) => { const p = P(l.pid) || {}; return `<div class="ln"><div class="row sp" style="flex-wrap:nowrap"><div class="nm">${esc(p.desc || '?')}</div><b style="font-size:16px">${fmtN(l.q)} <small>${esc(p.un || 'un')}</small></b></div><div class="mt"><span class="mono">${esc(p.cod || '')}</span>${l.lote ? `<span>lote ${esc(l.lote)}</span>` : ''}<span>entrada ${fmtD(l.dt)}</span>${valChip(l.val)}</div><div class="ac"><button class="btn sm" data-act="dr-mv" data-t="SAIDA" data-c="${code}" data-i="${i}">Saída</button><button class="btn sm" data-act="dr-mv" data-t="TRANSF" data-c="${code}" data-i="${i}">Transferir</button><button class="btn sm" data-act="dr-mv" data-t="AJUSTE" data-c="${code}" data-i="${i}">Ajustar</button><button class="btn sm r" data-act="dr-del" data-c="${code}" data-i="${i}">Excluir</button></div></div>`; }).join('') : `<div class="empty" style="padding:18px">Apartamento vazio.</div>`;
+  h += `<div class="row" style="margin:14px 0 8px"><button class="btn sm" data-act="plant" data-c="${code}">Ver na planta</button><button class="btn sm" data-act="dr-lab" data-c="${code}">Imprimir etiqueta</button></div>`;
+  h += `<b style="color:var(--n)">Histórico recente</b>` + (hist.length ? `<div class="list" style="margin-top:8px">${hist.map(m => `<div class="li"><div><span class="chip ${m.tipo === 'ENTRADA' ? 'ok' : m.tipo === 'SAIDA' ? 'bad' : m.tipo === 'TRANSF' ? 'y' : 'n'}">${tipoNome(m.tipo)}</span> ${esc((P(m.pid) || {}).desc || '?')}<div class="hint">${fmtTs(m.ts)}${m.orig && m.dest ? ' · ' + m.orig + ' → ' + m.dest : ''}</div></div><b>${m.tipo === 'AJUSTE' && m.q > 0 ? '+' : ''}${fmtN(m.q)}</b></div>`).join('')}</div>` : `<div class="hint" style="margin-top:6px">Sem movimentações neste endereço.</div>`);
+  openDr(h + `</div>`);
+}
+function openProd(id) {
+  const p = P(id); if (!p) return;
+  const locs = []; for (const s of Object.keys(SITES)) for (const code of Object.keys(S.stock[s])) for (const l of S.stock[s][code]) if (l.pid === id) locs.push({ s, code, l });
+  const tot = k => locs.filter(x => x.s === k).reduce((a, x) => a + x.l.q, 0);
+  openMod(`<div class="row sp"><h3 style="margin:0">${esc(p.desc)}</h3><button class="btn sm" data-act="close">Fechar</button></div><div class="row" style="margin:8px 0"><span class="chip n mono">${esc(p.cod)}</span>${p.ean ? `<span class="chip mono">EAN ${esc(p.ean)}</span>` : ''}${p.cat ? `<span class="chip">${esc(p.cat)}</span>` : ''}<span class="chip">${esc(p.un || 'UN')}</span></div>
+  <div class="row"><span class="chip y">Depósito: ${fmtN(tot('DEP'))}</span><span class="chip y">Loja: ${fmtN(tot('LOJ'))}</span></div>
+  <h3 style="margin-top:14px">Onde está</h3>${locs.length ? `<div class="list">${locs.slice(0, 40).map(x => `<button class="li" data-act="addr-site" data-s="${x.s}" data-c="${x.code}"><div><b class="mono">${x.code}</b> <span class="hint">${SITES[x.s]}${x.l.lote ? ' · lote ' + esc(x.l.lote) : ''}</span></div><div style="text-align:right"><b>${fmtN(x.l.q)}</b> ${valChip(x.l.val)}</div></button>`).join('')}</div>${locs.length > 40 ? `<p class="hint">+${locs.length - 40} locais.</p>` : ''}` : '<div class="hint">Sem estoque em nenhum endereço.</div>'}
+  <div class="row" style="margin-top:16px"><button class="btn p" data-act="prod-in" data-id="${id}">Dar entrada</button><button class="btn" data-act="prod-edit" data-id="${id}">Editar</button><button class="btn r" data-act="prod-del" data-id="${id}">Excluir</button></div>`);
+}
+function prodForm(p) {
+  const x = p || { cod: '', ean: '', desc: '', un: 'UN', cat: '', min: '' };
+  openMod(`<h3>${p ? 'Editar produto' : 'Novo produto'}</h3><div class="fg c2"><div><label class="f">Código interno (opcional)</label><input class="in" id="pf-cod" value="${esc(x.cod)}" placeholder="Gerado automaticamente se vazio"></div><div><label class="f">EAN (código de barras)</label><input class="in" id="pf-ean" inputmode="numeric" value="${esc(x.ean || '')}"></div></div>
+  <div style="margin-top:12px"><label class="f">Descrição (opcional)</label><input class="in" id="pf-desc" value="${esc(x.desc)}"></div>
+  <div class="fg c3" style="margin-top:12px"><div><label class="f">Unidade</label><select class="in" id="pf-un">${['UN', 'CX', 'FD', 'PCT', 'KG', 'L', 'PC'].map(u => `<option ${x.un === u ? 'selected' : ''}>${u}</option>`).join('')}</select></div><div><label class="f">Categoria</label><input class="in" id="pf-cat" list="cats" value="${esc(x.cat || '')}"><datalist id="cats">${['Bebidas', 'Bazar', 'Mercearia', 'Limpeza', 'Higiene', 'Hortifruti', 'Frios', 'Açougue'].map(c => `<option>${c}</option>`).join('')}</datalist></div><div><label class="f">Estoque mínimo</label><input class="in" id="pf-min" type="number" min="0" value="${esc(x.min || '')}"></div></div>
+  <div id="pf-err" class="err"></div><div class="row" style="margin-top:14px"><button class="btn p" data-act="pf-save" data-id="${p ? p.id : ''}">Salvar</button><button class="btn" data-act="close">Cancelar</button></div>`);
+}
+function saveProd(id) {
+  const v = k => $('#pf-' + k).value.trim(), err = m => { $('#pf-err').textContent = m; };
+  let cod = v('cod'); const ean = v('ean'); let desc = v('desc');
+  if (!cod) { cod = ean; if (!cod || S.prod.some(p => p.id !== +id && p.cod.toLowerCase() === cod.toLowerCase())) { let n = S.seq.prod; do { cod = 'M' + pad(n++, 4); } while (S.prod.some(p => p.cod.toLowerCase() === cod.toLowerCase())); } }
+  if (!desc) desc = '(sem descrição)';
+  if (S.prod.some(p => p.id !== +id && p.cod.toLowerCase() === cod.toLowerCase())) return err('Já existe um produto com esse código.');
+  if (ean && S.prod.some(p => p.id !== +id && p.ean && p.ean === ean)) return err('Já existe um produto com esse EAN.');
+  const o = { cod, ean, desc, un: v('un'), cat: v('cat'), min: +v('min') || 0 };
+  if (id) Object.assign(P(+id), o); else S.prod.push({ id: newPid(), ...o });
+  save(); closeMod(); render(); toast('Produto salvo.', 'ok');
+}
+
+/* ---------------- busca global ---------------- */
+function globalSearch(q) {
+  const box = $('#sres'), st = site(); q = q.trim();
+  if (q.length < 2) { box.classList.remove('on'); return; }
+  const ql = q.toLowerCase(); let h = '';
+  const code = parseAddr(st, q);
+  const adds = code ? [ADDR[st].map.get(code)] : ADDR[st].list.filter(a => a.code.includes(ql)).slice(0, 5);
+  if (adds.length) h += `<div class="sh">Endereços</div>` + adds.map(a => { const inf = addrInfo(st, a.code); return `<button data-act="addr" data-c="${a.code}"><b class="mono">${a.code}</b><span class="hint">${inf.L.length ? inf.L.length + ' produto(s)' : 'vazio'}</span></button>`; }).join('');
+  const ps = S.prod.filter(p => (p.cod + ' ' + (p.ean || '') + ' ' + p.desc).toLowerCase().includes(ql)).slice(0, 6);
+  if (ps.length) h += `<div class="sh">Produtos · onde está (${SITES[st]})</div>` + ps.map(p => {
+    const locs = Object.keys(S.stock[st]).filter(c => S.stock[st][c].some(l => l.pid === p.id));
+    const rows = locs.slice(0, 4).map(c => { const L = S.stock[st][c].filter(x => x.pid === p.id), qt = L.reduce((a, x) => a + x.q, 0), v = L.map(x => x.val).filter(Boolean).sort()[0]; return `<button data-act="addr" data-c="${c}" style="padding-left:24px"><b class="mono">${c}</b><span class="hint">${fmtN(qt)} ${esc(p.un || 'un')}${v ? ' · val ' + fmtD(v) : ''}</span></button>`; }).join('');
+    return `<button data-act="prod" data-id="${p.id}"><div><b>${esc(p.desc)}</b><div class="hint mono">${esc(p.cod)}${p.ean ? ' · EAN ' + esc(p.ean) : ''}</div></div></button>${locs.length ? rows + (locs.length > 4 ? `<div class="hint" style="padding:4px 24px">+${locs.length - 4} endereço(s)</div>` : '') : `<div class="hint" style="padding:4px 24px">Sem estoque em ${SITES[st]}</div>`}`;
+  }).join('');
+  box.innerHTML = h || `<div class="empty" style="padding:16px">Nada encontrado.</div>`; box.classList.add('on');
+}
+
+/* ---------------- câmera / leitor ---------------- */
+let scanStream = null, scanOn = false;
+function stopScan() { scanOn = false; if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; } }
+async function startScan(fieldId) {
+  try {
+    const det = new BarcodeDetector({ formats: ['code_39', 'code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a'] });
+    openMod(`<h3>Ler código</h3><video id="sv" playsinline muted style="width:100%;border-radius:12px;background:#000;max-height:60vh"></video><div class="row" style="margin-top:12px"><button class="btn" data-act="close">Cancelar</button></div>`);
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const v = $('#sv'); v.srcObject = scanStream; await v.play(); scanOn = true;
+    const tick = async () => { if (!scanOn) return; try { const r = await det.detect(v); if (r.length) { const val = r[0].rawValue; closeMod(); const e = $('#' + fieldId); if (e) { e.value = val; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } return; } } catch (e) {} setTimeout(tick, 250); };
+    tick();
+  } catch (e) { closeMod(); toast('Não foi possível abrir a câmera. Digite o código ou use um leitor.', 'bad'); }
+}
+
+/* ---------------- demonstração ---------------- */
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function ean13(base12) { let s = 0; for (let i = 0; i < 12; i++) s += +base12[i] * (i % 2 ? 3 : 1); return base12 + ((10 - s % 10) % 10); }
+function genDemo() {
+  const rnd = mulberry(20261116);
+  const cat = [['Cerveja Pilsen lata 350ml', 'Bebidas', 'CX', 180], ['Cerveja Pilsen long neck 330ml', 'Bebidas', 'CX', 180], ['Refrigerante cola 2L', 'Bebidas', 'FD', 240], ['Refrigerante guaraná 2L', 'Bebidas', 'FD', 240], ['Água mineral sem gás 500ml', 'Bebidas', 'FD', 300], ['Água mineral com gás 500ml', 'Bebidas', 'FD', 300], ['Suco de uva integral 1L', 'Bebidas', 'CX', 270], ['Suco de laranja 1L', 'Bebidas', 'CX', 150], ['Energético 473ml', 'Bebidas', 'CX', 360], ['Vinho tinto suave 750ml', 'Bebidas', 'CX', 0], ['Vinho branco seco 750ml', 'Bebidas', 'CX', 0], ['Cachaça prata 970ml', 'Bebidas', 'CX', 0], ['Chá pronto limão 1,5L', 'Bebidas', 'FD', 200],
+    ['Jogo de panelas 5 peças', 'Bazar', 'UN', 0], ['Frigideira antiaderente 24cm', 'Bazar', 'UN', 0], ['Copo de vidro 300ml (cx 12)', 'Bazar', 'CX', 0], ['Garrafa térmica 1L', 'Bazar', 'UN', 0], ['Guarda-chuva compacto', 'Bazar', 'UN', 0], ['Pote hermético 1,2L', 'Bazar', 'UN', 0], ['Tábua de corte bambu', 'Bazar', 'UN', 0], ['Ventilador de mesa 30cm', 'Bazar', 'UN', 0], ['Cooler térmico 26L', 'Bazar', 'UN', 0],
+    ['Arroz agulhinha tipo 1 5kg', 'Mercearia', 'FD', 365], ['Feijão carioca 1kg', 'Mercearia', 'FD', 300], ['Óleo de soja 900ml', 'Mercearia', 'CX', 365], ['Açúcar refinado 1kg', 'Mercearia', 'FD', 540], ['Café torrado e moído 500g', 'Mercearia', 'CX', 270], ['Macarrão espaguete 500g', 'Mercearia', 'FD', 420], ['Farinha de trigo 1kg', 'Mercearia', 'FD', 180], ['Biscoito recheado 140g', 'Mercearia', 'CX', 210], ['Leite integral UHT 1L', 'Mercearia', 'CX', 150], ['Molho de tomate 340g', 'Mercearia', 'CX', 360],
+    ['Detergente líquido 500ml', 'Limpeza', 'CX', 720], ['Sabão em pó 1,6kg', 'Limpeza', 'CX', 720], ['Água sanitária 2L', 'Limpeza', 'FD', 365], ['Desinfetante 1L', 'Limpeza', 'CX', 720], ['Papel higiênico 12 rolos', 'Higiene', 'FD', 0], ['Creme dental 90g', 'Higiene', 'CX', 720], ['Sabonete 85g', 'Higiene', 'CX', 720], ['Shampoo 350ml', 'Higiene', 'CX', 720]];
+  const S2 = blank(); S2.cfg = { ...S.cfg };
+  cat.forEach((c, i) => S2.prod.push({ id: S2.seq.prod++, cod: 'P' + pad(i + 1, 4), ean: ean13('2' + pad(100000 + i * 17, 11)), desc: c[0], cat: c[1], un: c[2], min: 40 + Math.floor(rnd() * 120), shelf: c[3] }));
+  const pick = a => a[Math.floor(rnd() * a.length)], dayOff = n => { const d = new Date(); d.setDate(d.getDate() + n); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+  const byCat = k => S2.prod.filter(p => k.includes(p.cat));
+  for (const st of ['DEP', 'LOJ']) for (const a of ADDR[st].list) {
+    if (rnd() > (st === 'DEP' ? 0.62 : 0.55)) continue;
+    const pool = st === 'LOJ' && a.rua === 7 ? byCat(['Bebidas', 'Bazar']) : st === 'LOJ' ? byCat(['Mercearia', 'Limpeza', 'Higiene']) : S2.prod;
+    const n = rnd() < 0.22 ? 2 + (rnd() < 0.3 ? 1 : 0) : 1, used = new Set();
+    for (let k = 0; k < n; k++) {
+      const p = pick(pool); if (used.has(p.id)) continue; used.add(p.id);
+      let val = ''; if (p.shelf) { const r = rnd(); val = dayOff(r < 0.05 ? -Math.floor(5 + rnd() * 20) : r < 0.2 ? Math.floor(3 + rnd() * 26) : Math.floor(40 + rnd() * p.shelf)); }
+      const q = (st === 'LOJ' ? 6 : 20) + Math.floor(rnd() * (st === 'LOJ' ? 60 : 240)), lote = 'L' + (240 + Math.floor(rnd() * 90)), dt = dayOff(-Math.floor(rnd() * 25));
+      (S2.stock[st][a.code] || (S2.stock[st][a.code] = [])).push({ pid: p.id, q, val, lote, dt });
+      S2.mov.push({ id: S2.seq.mov++, ts: dt + 'T0' + (7 + Math.floor(rnd() * 3)) + ':' + pad(Math.floor(rnd() * 60), 2) + ':00', op: 'Demonstração', site: st, tipo: 'ENTRADA', pid: p.id, q, dest: a.code, val, lote, obs: 'Carga inicial (demonstração)' });
+    }
+  }
+  S2.mov.sort((a, b) => a.ts.localeCompare(b.ts));
+  S2.prod.forEach(p => delete p.shelf);
+  return S2;
+}
+
+/* ---------------- Excel (.xlsx) → texto CSV, sem bibliotecas externas ---------------- */
+async function xInflate(u8) { const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter(); w.write(u8); w.close(); return new Uint8Array(await new Response(ds.readable).arrayBuffer()); }
+async function xUnzip(buf) {
+  const u8 = new Uint8Array(buf), dv = new DataView(buf); let e = u8.length - 22;
+  while (e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--;
+  if (e < 0) throw new Error('Arquivo inválido: não é uma planilha .xlsx.');
+  const n = dv.getUint16(e + 10, true); let p = dv.getUint32(e + 16, true); const files = {};
+  for (let i = 0; i < n && dv.getUint32(p, true) === 0x02014b50; i++) {
+    const meth = dv.getUint16(p + 10, true), csz = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    files[new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nl))] = { meth, csz, off }; p += 46 + nl + xl + cl;
+  }
+  return async name => { const f = files[name]; if (!f) return null; const l = f.off + 30 + dv.getUint16(f.off + 26, true) + dv.getUint16(f.off + 28, true), d = u8.subarray(l, l + f.csz); return new TextDecoder('utf-8').decode(f.meth === 0 ? d : await xInflate(d)); };
+}
+async function xlsxToCsv(buf) {
+  if (typeof DecompressionStream === 'undefined') throw new Error('Este navegador não lê Excel. Salve a planilha como CSV ou atualize o navegador.');
+  const get = await xUnzip(buf), X = s => new DOMParser().parseFromString(s, 'application/xml'), tags = (el, n) => [...el.getElementsByTagName(n)];
+  const wb = await get('xl/workbook.xml'); if (!wb) throw new Error('Arquivo inválido: não é uma planilha .xlsx.');
+  let path = 'xl/worksheets/sheet1.xml'; const sh = tags(X(wb), 'sheet')[0];
+  if (sh) { const rid = sh.getAttribute('r:id') || sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'), rels = await get('xl/_rels/workbook.xml.rels'); if (rels && rid) { const t = tags(X(rels), 'Relationship').find(r => r.getAttribute('Id') === rid); if (t) { const tg = t.getAttribute('Target'); path = tg.startsWith('/') ? tg.slice(1) : 'xl/' + tg; } } }
+  const sx = await get(path); if (!sx) throw new Error('Não encontrei a primeira aba da planilha.');
+  const ss = await get('xl/sharedStrings.xml'), SS = ss ? tags(X(ss), 'si').map(si => tags(si, 't').filter(t => !t.closest('rPh')).map(t => t.textContent).join('')) : [];
+  const st = await get('xl/styles.xml'), dateXf = []; if (st) {
+    const sd = X(st), custom = {}; tags(sd, 'numFmt').forEach(n => { custom[n.getAttribute('numFmtId')] = n.getAttribute('formatCode') || ''; });
+    const cx = tags(sd, 'cellXfs')[0]; if (cx) [...cx.children].forEach((xf, i) => { const id = +xf.getAttribute('numFmtId'), c = custom[id]; dateXf[i] = (id >= 14 && id <= 22) || (id >= 27 && id <= 36) || (id >= 45 && id <= 47) || (id >= 50 && id <= 58) || (c !== undefined && /[dmy]/i.test(c.replace(/"[^"]*"|\[[^\]]*\]|\\./g, '')) && !/general/i.test(c)); });
+  }
+  const iso = n => { const d = new Date(Date.UTC(1899, 11, 30) + Math.floor(+n) * 864e5); return d.toISOString().slice(0, 10); };
+  const colIdx = r => { let n = 0; for (const ch of r.replace(/\d/g, '')) n = n * 26 + ch.charCodeAt(0) - 64; return n - 1; };
+  const rows = [];
+  for (const row of tags(X(sx), 'row')) {
+    const out = [];
+    for (const c of [...row.children].filter(x => x.tagName === 'c' || x.localName === 'c')) {
+      const t = c.getAttribute('t'), v = c.getElementsByTagName('v')[0], i = colIdx(c.getAttribute('r') || '');
+      let val = '';
+      if (t === 's') val = v ? (SS[+v.textContent] || '') : '';
+      else if (t === 'inlineStr') val = tags(c, 't').map(x => x.textContent).join('');
+      else if (t === 'b') val = v && v.textContent === '1' ? 'SIM' : 'NÃO';
+      else if (v) { val = v.textContent; if (t !== 'str' && t !== 'e' && dateXf[+c.getAttribute('s')] && !isNaN(+val)) val = iso(val); }
+      out[i >= 0 ? i : out.length] = val.trim();
+    }
+    if (out.some(x => x)) rows.push(out);
+  }
+  const w = Math.max(0, ...rows.map(r => r.length));
+  return rows.map(r => Array.from({ length: w }, (_, i) => { const x = r[i] || ''; return /[;"\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(';')).join('\n');
+}
+/* lê CSV ou Excel e devolve texto CSV */
+async function fileText(f) {
+  const buf = await f.arrayBuffer();
+  if (/\.xls$/i.test(f.name)) throw new Error('O formato .xls (Excel antigo) não é lido. No Excel, use Salvar como → Pasta de Trabalho do Excel (.xlsx).');
+  if (/\.xls[xm]$/i.test(f.name)) return xlsxToCsv(buf);
+  let t = new TextDecoder('utf-8').decode(buf); if (t.includes('�')) t = new TextDecoder('windows-1252').decode(buf); return t;
+}
+
+/* ---------------- CSV (importação) ---------------- */
+function parseCSV(text) {
+  text = text.replace(/^﻿/, ''); const first = text.split(/\r?\n/)[0] || ''; const d = (first.match(/;/g) || []).length >= (first.match(/,/g) || []).length ? ';' : ',';
+  const rows = []; let cur = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) { const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true; else if (c === d) { cur.push(f); f = ''; } else if (c === '\n') { cur.push(f); rows.push(cur); cur = []; f = ''; } else if (c !== '\r') f += c; }
+  if (f !== '' || cur.length) { cur.push(f); rows.push(cur); }
+  return rows.filter(r => r.some(x => x.trim() !== ''));
+}
+const normDate = s => { s = (s || '').trim(); if (!s) return ''; let m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (m) return s; m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? `${m[3]}-${pad(m[2], 2)}-${pad(m[1], 2)}` : null; };
+const isCodeTxt = t => /^\d{6,14}$/.test(String(t || '').trim());
+function quickProd(raw, desc) {
+  raw = String(raw || '').trim(); const isC = isCodeTxt(raw); let cod = isC ? raw : '';
+  if (isC) { const ex = S.prod.find(q => q.cod.toLowerCase() === cod.toLowerCase() || q.ean === cod); if (ex) return ex; }
+  if (!cod) { let n = S.seq.prod; do { cod = 'M' + pad(n++, 4); } while (S.prod.some(q => q.cod.toLowerCase() === cod.toLowerCase())); }
+  const np = { id: newPid(), cod, ean: isC ? raw : '', desc, un: 'UN', cat: '', min: 0 }; S.prod.push(np); save(); return np;
+}
+const quickAddHtml = v => `<div class="card" style="margin-top:8px;background:#FFF8DC"><div class="hint"><b>Produto não encontrado?</b> Inclua manualmente:</div><input class="in" id="mv-qd" placeholder="Descrição do produto" value="${isCodeTxt(v) ? '' : esc(String(v || '').trim())}" style="margin:6px 0" autocomplete="off"><div class="row"><button type="button" class="btn p" data-act="mvquick">Incluir e usar</button><a href="#" data-act="prod-new">Cadastro completo</a></div></div>`;
+function importProdutos(text) {
+  const rows = parseCSV(text); let novos = 0, atual = 0; const bad = [];
+  if (!rows.length) return { novos, atual, bad: ['arquivo vazio'] };
+  const norm = x => String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+  const H = rows[0].map(norm), has = (i) => i >= 0;
+  const ei = H.findIndex(h => /barra|ean|gtin/.test(h));
+  const di = H.findIndex(h => /descr|produto|nome/.test(h));
+  const ci = H.findIndex((h, i) => i !== ei && /cod|sku/.test(h));
+  const ui = H.findIndex(h => h === 'un' || h === 'und' || h === 'unidade');
+  const ti = H.findIndex(h => /categ/.test(h));
+  const header = has(ei) || has(di);
+  let I = { c: ci, e: ei, d: di, u: ui, t: ti };
+  if (!header) I = rows[0].length >= 3 ? { c: 0, e: 1, d: 2, u: -1, t: -1 } : { c: -1, e: 0, d: 1, u: -1, t: -1 };
+  const g = (r, i) => i >= 0 && r[i] != null ? String(r[i]).trim() : '';
+  for (let i = header ? 1 : 0; i < rows.length; i++) {
+    const r = rows[i], ean = g(r, I.e).replace(/\D/g, ''), desc = g(r, I.d); let cod = g(r, I.c) || ean;
+    if (!desc) { bad.push(`linha ${i + 1}: sem descrição`); continue; }
+    if (!cod) { bad.push(`linha ${i + 1}: sem código nem código de barras`); continue; }
+    let x = (ean && S.prod.find(q => q.ean === ean)) || S.prod.find(q => q.cod.toLowerCase() === cod.toLowerCase());
+    if (x) { x.desc = desc; if (ean && !x.ean) x.ean = ean; if (g(r, I.u)) x.un = g(r, I.u).toUpperCase(); if (g(r, I.t)) x.cat = g(r, I.t); atual++; }
+    else { S.prod.push({ id: newPid(), cod, ean, desc, un: (g(r, I.u) || 'UN').toUpperCase(), cat: g(r, I.t), min: 0 }); novos++; }
+  }
+  save(); return { novos, atual, bad };
+}
+function importCSV(text) {
+  const st = site(), rows = parseCSV(text); let ok = 0, bad = []; let start = 0;
+  if (rows.length && /endere/i.test(rows[0][0] || '')) start = 1;
+  for (let i = start; i < rows.length; i++) {
+    const r = rows[i].map(x => x.trim()), code = parseAddr(st, r[0]);
+    if (!code) { bad.push(`linha ${i + 1}: endereço inválido (${r[0] || 'vazio'})`); continue; }
+    const cod = r[1], desc = r[2], q = parseFloat((r[3] || '').replace(',', '.')), val = normDate(r[4]);
+    if (!cod) { bad.push(`linha ${i + 1}: código do produto vazio`); continue; }
+    if (!(q > 0)) { bad.push(`linha ${i + 1}: quantidade inválida`); continue; }
+    if (val === null) { bad.push(`linha ${i + 1}: validade inválida`); continue; }
+    let p = S.prod.find(x => x.cod.toLowerCase() === cod.toLowerCase());
+    if (!p) { if (!desc) { bad.push(`linha ${i + 1}: produto novo sem descrição`); continue; } p = { id: newPid(), cod, ean: '', desc, un: (r[6] || 'UN').toUpperCase(), cat: '', min: 0 }; S.prod.push(p); }
+    addLine(st, code, p.id, q, val, r[5] || ''); logMove({ site: st, tipo: 'ENTRADA', pid: p.id, q, dest: code, val: val || '', lote: r[5] || '', obs: 'Importação CSV' }); ok++;
+  }
+  save(); return { ok, bad };
+}
+
+/* ---------------- renderização principal ---------------- */
+function mobTables() {
+  $$('#view table.t').forEach(tb => {
+    const rows = [...tb.querySelectorAll('tr')]; const hd = rows.find(r => r.querySelector('th')); if (!hd) return;
+    const labs = [...hd.children].map(x => x.textContent.trim()); hd.classList.add('hd');
+    rows.forEach(r => { if (r === hd) return; [...r.children].forEach((c, i) => { if (c.tagName === 'TD') { c.dataset.l = labs[i] || ''; if (!c.textContent.trim() && !c.querySelector('button,svg,input')) c.classList.add('em'); } }); });
+  });
+}
+function render() {
+  if (UI.tab === 'mapa') { UI.tab = 'planta'; UI.mv2 = 'rua'; }
+  const t = UI.tab, st = site();
+  $('#lojaSel').innerHTML = LOJAS.map(l => `<option value="${l.id}" ${l.id === S.cfg.loja ? 'selected' : ''}>${esc(l.nome)}</option>`).join(''); setSy(SY.st);
+  $('#siteSeg').innerHTML = Object.keys(SITES).map(k => `<button class="${k === st ? 'on' : ''}" data-act="site" data-s="${k}">${SITES[k]}</button>`).join('');
+  $('#side').innerHTML = NAV.map(n => `<button class="${t === n[0] ? 'on' : ''}" data-act="tab" data-t="${n[0]}">${ic(n[0])}${n[1]}</button>`).join('') + `<div class="ver">Nilo WMS · v1.0</div>`;
+  const more = !BAR.includes(t);
+  $('#bar').innerHTML = BAR.map(k => `<button class="${t === k ? 'on' : ''}" data-act="tab" data-t="${k}">${ic(k)}${NAV.find(n => n[0] === k)[1]}</button>`).join('') + `<button class="${more ? 'on' : ''}" data-act="more-menu">${ic('mais')}Mais</button>`;
+  const semP = ADDR[st].list.length === 0 && ['painel', 'planta', 'busca', 'end', 'mover', 'rel', 'etq'].includes(t);
+  $('#view').innerHTML = semP ? semPlanta() : (VIEWS[t] || VIEWS.painel)();
+  mobTables();
+  const fn = { prod: 'pq', end: null }[t];
+  document.body.classList.remove('pl');
+}
+function go(tab) { UI.tab = tab; closeDr(); closeMod(); render(); window.scrollTo(0, 0); }
+
+/* ---------------- eventos ---------------- */
+document.addEventListener('change', e => { if (e.target.id === 'lojaSel') switchLoja(e.target.value); });
+document.addEventListener('click', e => {
+  const sr = $('#sres'); if (sr && !e.target.closest('.search')) sr.classList.remove('on');
+  if (e.target.id === 'ov') return closeDr(); if (e.target.id === 'mod') return closeMod();
+  const el = e.target.closest('[data-act]'); if (!el) return; const d = el.dataset, a = d.act;
+  switch (a) {
+    case 'tab': go(d.t); break;
+    case 'site': S.cfg.site = d.s; UI.plsite = ''; save(); UI.fl = { q: '', rua: '', st: '' }; UI.lim = 80; UI.mv.orig = UI.mv.dest = ''; UI.mv.idx = null; UI.sel = ''; UI.rua = (ADDR[d.s].struct[0] || { rua: 1 }).rua; UI.lb.rua = UI.rua; closeDr(); render(); break;
+    case 'close': closeDr(); closeMod(); break;
+    case 'addr': { $('#sres').classList.remove('on'); closeMod(); openAddr(d.c); if (UI.tab === 'planta' && UI.mv2 === 'rua') { $$('.ap.sel').forEach(x => x.classList.remove('sel')); const b = $(`.ap[data-c="${d.c}"]`); if (b) b.classList.add('sel'); } break; }
+    case 'addr-site': S.cfg.site = d.s; save(); closeMod(); render(); openAddr(d.c); break;
+    case 'mapv': UI.mv2 = d.v; render(); break;
+    case 'maprua': UI.rua = +d.r; UI.mv2 = 'rua'; UI.tab = 'planta'; render(); window.scrollTo(0, 0); break;
+    case 'more': UI.lim += 120; render(); break;
+    case 'more-menu': openMod(`<h3>Mais opções</h3><div class="list">${NAV.filter(n => !BAR.includes(n[0])).map(n => `<button class="li" data-act="tab" data-t="${n[0]}"><span class="row">${ic(n[0])}<b>${n[1]}</b></span><span>›</span></button>`).join('')}</div>`); break;
+    case 'demo': if (ADDR.DEP.list.length === 0) { toast('Esta loja ainda não tem planta cadastrada.', 'bad'); break; } if (confirm('Substituir os dados desta loja pela demonstração (produtos e estoque fictícios)?' + (S.cfg.hook ? ' Isso também será refletido na planilha (nuvem).' : ''))) { const D = genDemo(); S.prod = D.prod; S.stock = D.stock; S.mov = D.mov; S.seq.mov = Math.max(S.seq.mov, D.seq.mov); save(); toast('Demonstração carregada.', 'ok'); closeMod(); go('painel'); } break;
+    case 'prod': $('#sres').classList.remove('on'); openProd(+d.id); break;
+    case 'plant': e.preventDefault(); UI.plsite = site(); UI.pl = { hl: [d.c], site: site() }; go('planta'); break;
+    case 'plsite': UI.plsite = d.s; render(); break;
+    case 'plclear': UI.pl = { hl: [], site: '' }; render(); break;
+    case 'bsel': UI.bsel = d.c; render(); { const b = $('#bpl'); if (b) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); } break;
+    case 'prod-new': prodForm(null); break;
+    case 'mvnew': { e.preventDefault(); const b = $('#mv-sug'); if (b) b.innerHTML = quickAddHtml(($('#mv-prod') || {}).value); break; }
+    case 'mvquick': {
+      const desc = (($('#mv-qd') || {}).value || '').trim(), raw = (($('#mv-prod') || {}).value || '').trim();
+      if (!desc) { toast('Informe a descrição.', 'bad'); break; }
+      const np = quickProd(raw, desc);
+      syncMv(); UI.mv.pid = np.id; mvRefresh('mv-q'); toast('Produto incluído na base.', 'ok'); break; }
+    case 'bqnew': { const desc = (($('#bq-d') || {}).value || '').trim(); if (!desc) { toast('Informe a descrição.', 'bad'); break; } const np = quickProd(UI.bq, desc); UI.bq = isCodeTxt(UI.bq) ? UI.bq : np.cod; toast('Produto incluído na base. Ainda sem endereço.', 'ok'); render(); break; }
+    case 'min-zero': { const n = S.prod.filter(q => q.min).length; if (!n) { toast('O estoque mínimo já está zerado.', ''); break; } if (confirm(`Zerar o estoque mínimo de ${n} produto(s)? Você poderá definir de novo editando cada produto.`)) { S.prod.forEach(q => { q.min = 0; }); save(); render(); toast('Estoque mínimo zerado.', 'ok'); } break; }
+    case 'prod-edit': prodForm(P(+d.id)); break;
+    case 'pf-save': saveProd(d.id); break;
+    case 'prod-del': { const id = +d.id; const used = usedPids().has(id); if (used) { toast('Há estoque deste produto. Zere o estoque antes de excluir.', 'bad'); break; } if (confirm('Excluir este produto do cadastro?')) { S.prod = S.prod.filter(p => p.id !== id); save(); closeMod(); render(); toast('Produto excluído.', 'ok'); } break; }
+    case 'prod-in': UI.mv = { tipo: 'ENTRADA', orig: '', dest: '', pid: +d.id, idx: null, q: '', val: '', lote: '', obs: '' }; go('mover'); break;
+    case 'dr-in': UI.mv = { tipo: 'ENTRADA', orig: '', dest: d.c, pid: null, idx: null, q: '', val: '', lote: '', obs: '' }; go('mover'); break;
+    case 'dr-mv': UI.mv = { tipo: d.t, orig: d.c, dest: '', pid: null, idx: +d.i, q: '', val: '', lote: '', obs: '' }; go('mover'); break;
+    case 'dr-lab': { const x = ADDR[site()].map.get(d.c); UI.lb = { ...UI.lb, rua: x.rua, face: x.face, p1: x.p, p2: x.p, niv: x.n }; go('etq'); break; }
+    case 'mvtipo': syncMv(); UI.mv.tipo = d.t; UI.mv.idx = null; mvRefresh(); break;
+    case 'mvgo': mvGo(); break;
+    case 'mvclear': UI.mv = { tipo: UI.mv.tipo, orig: '', dest: '', pid: null, idx: null, q: '', val: '', lote: '', obs: '' }; mvRefresh(); break;
+    case 'mvpick': UI.mv.pid = +d.id; mvRefresh(); break;
+    case 'scan': startScan(d.f); break;
+    case 'rep': UI.rep = d.r; render(); break;
+    case 'print': window.print(); break;
+    case 'lb-print': { $('#print-area').innerHTML = `<div class="labs ${+UI.lb.cols === 3 ? 'cols3' : ''}" style="--cols:${UI.lb.cols}">${labelAddrs().map(labelHtml).join('')}</div>`; document.body.classList.add('pl'); setTimeout(() => window.print(), 80); break; }
+    case 'exp-end': download(`enderecos_${site()}_${today()}.csv`, csv([['Endereço', 'Rua', 'Prédio', 'Nível', 'Apto', 'Situação', 'Produtos', 'Unidades'], ...filteredAddrs().map(x => { const i = addrInfo(site(), x.code); return [x.code, x.rua, x.p, x.n, x.a, i.st, i.L.map(l => (P(l.pid) || {}).desc).join(' | '), lineQ(i.L)]; })]), 'text/csv'); break;
+    case 'exp-mov': download(`movimentacoes_${site()}_${today()}.csv`, csv([['Data/hora', 'Tipo', 'Código', 'Produto', 'Qtd', 'Origem', 'Destino', 'Validade', 'Lote', 'Operador', 'Obs'], ...relMov().map(m => [fmtTs(m.ts), tipoNome(m.tipo), (P(m.pid) || {}).cod, (P(m.pid) || {}).desc, m.q, m.orig || '', m.dest || '', fmtD(m.val), m.lote || '', m.op || '', m.obs || ''])]), 'text/csv'); break;
+    case 'exp-est': download(`estoque_${site()}_${today()}.csv`, csv([['Endereço', 'Código', 'Produto', 'Qtd', 'Un', 'Validade', 'Lote'], ...stockRows().map(x => [x.code, x.p.cod, x.p.desc, x.l.q, x.p.un, fmtD(x.l.val), x.l.lote || ''])]), 'text/csv'); break;
+    case 'exp-prod': download(`produtos_${today()}.csv`, csv([['Código', 'EAN', 'Descrição', 'Unidade', 'Categoria', 'Estoque mínimo'], ...S.prod.map(p => [p.cod, p.ean || '', p.desc, p.un, p.cat || '', p.min || 0])]), 'text/csv'); break;
+    case 'tpl-csv': download('modelo_importacao_estoque.csv', csv([['endereço', 'código', 'descrição', 'quantidade', 'validade', 'lote', 'unidade'], ['03-012-2-01', 'P0001', 'Cerveja Pilsen lata 350ml', '120', '31/12/2026', 'L245', 'CX']]), 'text/csv'); break;
+    case 'imp-csv': $('#f-csv').click(); break;
+    case 'imp-prod': $('#f-prod').click(); break;
+    case 'tpl-prod': download('modelo_base_produtos.csv', csv([['código de barras', 'descrição', 'código interno (opcional)', 'unidade (opcional)', 'categoria (opcional)'], ['7891234567895', 'Cerveja Pilsen lata 350ml', 'P0001', 'CX', 'Bebidas']]), 'text/csv'); break;
+    case 'bk-exp': download(`backup_nilo_wms_${today()}.json`, JSON.stringify(S), 'application/json'); break;
+    case 'bk-imp': $('#f-bk').click(); break;
+    case 'cf-save': { S.cfg.op = $('#cf-op').value.trim(); S.cfg.hook = $('#cf-hook').value.trim(); S.cfg.token = ($('#cf-token') || { value: '' }).value.trim(); persist(); toast('Configurações salvas.', 'ok');
+      if (S.cfg.hook) { setSy('busy'); syncNow({ manual: true }).then(() => { toast(SY.st === 'ok' ? 'Conectado à planilha.' : SY.st === 'pause' ? 'Há dados nos dois lados: escolha uma opção abaixo.' : 'Não conectou: ' + SY.msg, SY.st === 'ok' ? 'ok' : 'bad'); }); } else setSy('off'); break; }
+    case 'sync-now': setSy('busy'); syncNow({ manual: true }).then(() => toast(SY.st === 'ok' ? 'Sincronizado.' : 'Falha: ' + SY.msg, SY.st === 'ok' ? 'ok' : 'bad')); break;
+    case 'cloud-down': if (confirm('Baixar da nuvem: produtos e a loja ' + LOJA_NOME(S.cfg.loja) + ' serão SUBSTITUÍDOS pelos dados da planilha neste aparelho. Continuar?')) { setSy('busy'); syncNow({ manual: true, mode: 'down' }).then(() => { toast(SY.st === 'ok' ? 'Dados baixados da nuvem.' : 'Falha: ' + SY.msg, SY.st === 'ok' ? 'ok' : 'bad'); render(); }); } break;
+    case 'cloud-up': if (confirm('Enviar este aparelho: a planilha ficará IGUAL ao que há aqui (produtos e loja ' + LOJA_NOME(S.cfg.loja) + '). Dados da nuvem que não existem aqui serão removidos. Continuar?')) { setSy('busy'); syncNow({ manual: true, mode: 'up' }).then(() => { toast(SY.st === 'ok' ? 'Planilha atualizada com os dados deste aparelho.' : 'Falha: ' + SY.msg, SY.st === 'ok' ? 'ok' : 'bad'); }); } break;
+    case 'loja-sho': switchLoja('SHO'); break;
+    case 'script': openMod(`<h3>Código do Apps Script</h3><ol class="hint"><li>Abra a planilha → Extensões → Apps Script.</li><li>Cole o código abaixo e salve (arquivo Code.gs).</li><li>Execute uma vez a função <b>prepararPlanilha</b> e autorize.</li><li>Implantar → Nova implantação → Aplicativo da Web → Executar como: você · Acesso: qualquer pessoa.</li><li>Copie a URL terminada em /exec e cole aqui em Nuvem.</li></ol><pre class="code">${esc(APPS_SCRIPT)}</pre><div class="row" style="margin-top:12px"><button class="btn p" data-act="copy-script">Copiar código</button><button class="btn" data-act="close">Fechar</button></div>`); break;
+    case 'copy-script': navigator.clipboard && navigator.clipboard.writeText(APPS_SCRIPT).then(() => toast('Código copiado.', 'ok')).catch(() => toast('Selecione e copie manualmente.', 'bad')); break;
+    case 'dr-del': {
+      const st = site(), L = S.stock[st][d.c] || [], ln = L[+d.i]; if (!ln) break;
+      if (!confirm(`Excluir "${(P(ln.pid) || {}).desc || 'produto'}" (${fmtN(ln.q)}${ln.val ? ', val. ' + fmtD(ln.val) : ''}) do endereço ${d.c}? Fica registrado no histórico.`)) break;
+      const r = opAjuste({ site: st, orig: d.c, idx: +d.i, q: 0, obs: 'Exclusão do produto do endereço' });
+      if (r && r.err) { toast(r.err, 'bad'); break; }
+      toast('Produto excluído do endereço.', 'ok'); render(); openAddr(d.c); break; }
+    case 'zerar-end': {
+      const n = Object.keys(S.stock.DEP || {}).length + Object.keys(S.stock.LOJ || {}).length;
+      if (confirm(`Esvaziar ${n} endereço(s) ocupado(s) e apagar o histórico de movimentações? A base de produtos (${S.prod.length}) será mantida.${S.cfg.hook ? ' Os endereços também serão esvaziados na planilha (nuvem), apenas desta loja.' : ''}`)) { S.stock = { DEP: {}, LOJ: {} }; S.mov = []; S.seq.mov = 1; save(); toast('Endereços zerados. Base de produtos mantida.', 'ok'); go('painel'); } break; }
+    case 'rm-demo': {
+      const demo = S.prod.filter(q => /^P\d{4}$/.test(q.cod) && /^2000/.test(q.ean || ''));
+      if (!demo.length) { toast('Nenhum produto de demonstração encontrado.', ''); break; }
+      const used = usedPids();
+      const free = demo.filter(q => !used.has(q.id));
+      if (free.length < demo.length) { toast('Zere os endereços antes de remover os produtos de demonstração.', 'bad'); break; }
+      if (confirm(`Remover ${demo.length} produto(s) de demonstração (códigos P0001…, EAN iniciado em 2000)? Os demais produtos serão mantidos.`)) { const ids = new Set(demo.map(q => q.id)); S.prod = S.prod.filter(q => !ids.has(q.id)); save(); toast('Produtos de demonstração removidos.', 'ok'); render(); } break; }
+    case 'reset': { const t = prompt('Isto apaga TODOS os dados deste aparelho. Digite APAGAR para confirmar:'); if (t === 'APAGAR') { const k = S.cfg; S = blank(); S.cfg.hook = k.hook; S.cfg.token = k.token; S.cfg.loja = k.loja; S.cfg.op = k.op; rebuildAddr(); save(); toast('Dados apagados.', 'ok'); go('painel'); } break; }
+  }
+});
+document.addEventListener('input', e => {
+  const id = e.target.id;
+  if (id === 'gs') return globalSearch(e.target.value);
+  if (id === 'fl-q') { UI.fl.q = e.target.value; UI.lim = 80; const pos = e.target.selectionStart; render(); const n = $('#fl-q'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
+  if (id === 'bq') { UI.bq = e.target.value; UI.bsel = ''; const pos = e.target.selectionStart; render(); const n = $('#bq'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
+  if (id === 'pq') { UI.pq = e.target.value; const pos = e.target.selectionStart; render(); const n = $('#pq'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
+  if (id === 'rf-q') { UI.rf.q = e.target.value; const pos = e.target.selectionStart; render(); const n = $('#rf-q'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
+  if (id === 'mv-prod') {
+    const q = e.target.value.trim().toLowerCase(), box = $('#mv-sug'); if (!box) return;
+    if (q.length < 2) { box.innerHTML = ''; return; }
+    const ex = S.prod.find(p => p.cod.toLowerCase() === q || p.ean === e.target.value.trim());
+    if (ex) { syncMv(); UI.mv.pid = ex.id; mvRefresh('mv-q'); return; }
+    const L = S.prod.filter(p => (p.cod + ' ' + (p.ean || '') + ' ' + p.desc).toLowerCase().includes(q)).slice(0, 8);
+    box.innerHTML = L.length ? `<div class="sug">${L.map(p => `<button type="button" data-act="mvpick" data-id="${p.id}"><b>${esc(p.desc)}</b> <span class="hint mono">${esc(p.cod)}</span></button>`).join('')}</div><div style="margin-top:6px"><a href="#" data-act="mvnew">Não é nenhum destes? Incluir novo produto</a></div>` : quickAddHtml(e.target.value);
+  }
+});
+document.addEventListener('change', e => {
+  const id = e.target.id;
+  if (id === 'fl-rua') { UI.fl.rua = e.target.value; UI.lim = 80; render(); }
+  else if (id === 'fl-st') { UI.fl.st = e.target.value; UI.lim = 80; render(); }
+  else if (id === 'rf-de' || id === 'rf-ate' || id === 'rf-tipo' || id === 'rf-d') { UI.rf[id.slice(3)] = e.target.value; render(); }
+  else if (id.startsWith('lb-')) { const k = id.slice(3); UI.lb[k] = e.target.value; if (k === 'rua') { UI.lb.face = ''; } render(); }
+  else if (id === 'mv-orig' || id === 'mv-dest') { syncMv(); const st = site(), c = parseAddr(st, e.target.value); if (c) e.target.value = c; syncMv(); if (id === 'mv-orig') UI.mv.idx = null; mvRefresh(); }
+  else if (e.target.name === 'mv-ln') { UI.mv.idx = +e.target.value; }
+  else if (id === 'f-prod') {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    fileText(f).then(t => { const res = importProdutos(t);
+      openMod(`<h3>Base de produtos importada</h3><p><b>${fmtN(res.novos)}</b> produto(s) novo(s) e <b>${fmtN(res.atual)}</b> atualizado(s).</p>${res.bad.length ? `<p class="err"><b>${res.bad.length}</b> linha(s) ignorada(s):</p><pre class="code">${esc(res.bad.slice(0, 30).join('\n'))}${res.bad.length > 30 ? '\n…' : ''}</pre>` : ''}<button class="btn p" data-act="close" style="margin-top:12px">Fechar</button>`); render(); }).catch(er => toast(er.message || 'Não foi possível ler o arquivo.', 'bad'));
+  }
+  else if (id === 'f-csv') {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    fileText(f).then(t => { const res = importCSV(t); openMod(`<h3>Importação concluída</h3><p><b>${fmtN(res.ok)}</b> linha(s) importada(s) para ${SITES[site()]}.</p>${res.bad.length ? `<p class="err"><b>${res.bad.length}</b> linha(s) ignorada(s):</p><pre class="code">${esc(res.bad.slice(0, 30).join('\n'))}${res.bad.length > 30 ? '\n…' : ''}</pre>` : ''}<button class="btn p" data-act="close" style="margin-top:12px">Fechar</button>`); render(); }).catch(er => toast(er.message || 'Não foi possível ler o arquivo.', 'bad'));
+  }
+  else if (id === 'f-bk') { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { const o = JSON.parse(String(r.result)); if (!o || !(o.stock || o.lojas) || !o.prod) throw new Error('x'); if (!confirm('Substituir todos os dados atuais pelo backup?')) return; const k = S.cfg; S = norm(o); S.cfg.hook = k.hook; S.cfg.token = k.token; S.sync = freshSync(); rebuildAddr(); save(); toast('Backup restaurado.', 'ok'); go('painel'); } catch (er) { toast('Arquivo de backup inválido.', 'bad'); } }; r.readAsText(f); e.target.value = ''; }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDr(); closeMod(); $('#sres').classList.remove('on'); } if (e.key === 'Enter' && e.target.id === 'gs') { const b = $('#sres button'); if (b) b.click(); } });
+window.addEventListener('afterprint', () => document.body.classList.remove('pl'));
+window.addEventListener('hashchange', () => { const t = location.hash.replace('#/', ''); if (VIEWS[t]) go(t); });
+
+/* ---------------- autoteste (#selftest) ---------------- */
+function selftest() {
+  const out = []; const T = (n, c) => out.push((c ? 'PASS ' : 'FAIL ') + n);
+  T('Depósito = 850 endereços', ADDR.DEP.list.length === 850);
+  T('Loja = 1170 endereços', ADDR.LOJ.list.length === 1170);
+  T('Depósito 85 prédios', new Set(ADDR.DEP.list.map(a => a.rua + a.face + a.p)).size === 85);
+  T('Loja 161 prédios', new Set(ADDR.LOJ.list.map(a => a.rua + a.face + a.p)).size === 161);
+  T('Loja Rua 07 lado esquerdo (07-E, 12 prédios, 88 end.)', ADDR.LOJ.map.has('07-E-012-4-02') && !ADDR.LOJ.map.has('07-E-001-1-02') && !ADDR.LOJ.map.has('07-E-007-4-02') && ADDR.LOJ.map.has('07-E-007-4-01') && !ADDR.LOJ.map.has('07-E-013-1-01') && ADDR.LOJ.byRua[7].length === 202 && parseAddr('LOJ', '07E001101') === '07-E-001-1-01' && parseAddr('LOJ', '07-E-001-1-01') === '07-E-001-1-01' && parseAddr('LOJ', '07-001-1-01') === '07-001-1-01');
+  T('Loja ruas 02-06 com dois lados (001..024)', ADDR.LOJ.map.has('04-023-4-02') && ADDR.LOJ.map.has('04-024-4-02') && ADDR.LOJ.byRua[4].length === 176 && ADDR.LOJ.byRua[1].length === 88 && ADDR.LOJ.byRua[7].length === 202);
+  T('Rua 04 dir. termina em 014', !ADDR.DEP.map.has('04-016-1-01') && ADDR.DEP.map.has('04-014-5-02'));
+  T('Loja Rua 07 prédio 10 só 2 níveis', ADDR.LOJ.map.has('07-010-2-02') && !ADDR.LOJ.map.has('07-010-3-01'));
+  T('Loja Rua 01 só lado direito e vãos 1/7 com 1 apto', ADDR.LOJ.map.has('01-012-4-02') && !ADDR.LOJ.map.has('01-013-4-01') && ADDR.LOJ.map.has('01-001-1-01') && !ADDR.LOJ.map.has('01-001-1-02') && !ADDR.LOJ.map.has('01-007-4-02') && ADDR.LOJ.map.has('01-002-1-02') && ADDR.LOJ.map.has('01-006-1-02') && !ADDR.LOJ.map.has('04-001-1-02') && !ADDR.LOJ.map.has('04-014-2-02') && ADDR.LOJ.map.has('04-003-1-02') && ADDR.LOJ.map.has('04-014-2-01'));
+  T('Loja Rua 07 prédio 17 (4 níveis), 1-5 (3 níveis)', ADDR.LOJ.map.has('07-017-4-02') && !ADDR.LOJ.map.has('07-018-1-01') && !ADDR.LOJ.map.has('07-003-4-01') && ADDR.LOJ.map.has('07-006-4-02'));
+  T('parseAddr formatos', parseAddr('DEP', '03-012-2-01') === '03-012-2-01' && parseAddr('DEP', '03012201') === '03-012-2-01' && parseAddr('DEP', '3.12.2.1') === '03-012-2-01' && parseAddr('DEP', '99-001-1-01') === null);
+  S = blank();
+  S.prod.push({ id: S.seq.prod++, cod: 'A', ean: '', desc: 'Prod A', un: 'UN', cat: '', min: 0 }, { id: S.seq.prod++, cod: 'B', ean: '', desc: 'Prod B', un: 'UN', cat: '', min: 0 });
+  T('entrada', opEntrada({ site: 'DEP', dest: '03-012-2-01', pid: 1, q: 10, val: '2099-01-01', lote: 'X' }).ok);
+  T('entrada 2º produto no mesmo apto', opEntrada({ site: 'DEP', dest: '03-012-2-01', pid: 2, q: 5 }).ok && S.stock.DEP['03-012-2-01'].length === 2);
+  T('soma mesma linha', opEntrada({ site: 'DEP', dest: '03-012-2-01', pid: 1, q: 5, val: '2099-01-01', lote: 'X' }).ok && S.stock.DEP['03-012-2-01'][0].q === 15);
+  T('FEFO', (() => { opEntrada({ site: 'DEP', dest: '03-012-2-01', pid: 1, q: 4, val: '2098-01-01', lote: 'Y' }); opSaida({ site: 'DEP', orig: '03-012-2-01', pid: 1, q: 6 }); const L = S.stock.DEP['03-012-2-01'].filter(l => l.pid === 1); return L.find(l => l.lote === 'Y') === undefined && L.find(l => l.lote === 'X').q === 13; })());
+  T('saída acima do saldo é recusada', !!opSaida({ site: 'DEP', orig: '03-012-2-01', idx: 0, q: 9999 }).err);
+  T('transferência preserva val/lote', (() => { const r = opTransf({ site: 'DEP', orig: '03-012-2-01', dest: '03-012-2-02', idx: 0, q: 3 }); const l = S.stock.DEP['03-012-2-02'][0]; return r.ok && l.val === '2099-01-01' && l.lote === 'X' && l.q === 3; })());
+  T('ajuste', opAjuste({ site: 'DEP', orig: '03-012-2-02', idx: 0, q: 0 }).ok && !S.stock.DEP['03-012-2-02']);
+  T('histórico', S.mov.length >= 6);
+  T('estatísticas', (() => { const s = stats('DEP'); return s.occ === 1 && s.tot === 850 && s.skus === 2; })());
+  T('Code39 gera SVG', code39('03-012-2-01').includes('<rect'));
+  S = genDemo(); T('demo gera dados', S.prod.length > 30 && Object.keys(S.stock.DEP).length > 100 && Object.keys(S.stock.LOJ).length > 100);
+  T('demo: estoque só em endereços válidos', Object.keys(S.stock.LOJ).every(c => ADDR.LOJ.map.has(c)) && Object.keys(S.stock.DEP).every(c => ADDR.DEP.map.has(c)));
+  const ipr = importProdutos('código de barras;descrição\n7891234567895;Produto X\n7891234567895;Produto X2'); T('importa base de produtos', ipr.novos === 1 && ipr.atual === 1 && S.prod.some(p => p.ean === '7891234567895' && p.desc === 'Produto X2'));
+  const csvr = importCSV('endereço;código;descrição;quantidade;validade;lote;unidade\n01-001-1-01;ZZ1;Teste;10;31/12/2030;L1;UN\n99-1-1-1;ZZ2;Ruim;1;;;');
+  T('importação CSV (1 ok, 1 inválida)', csvr.ok === 1 && csvr.bad.length === 1);
+  go('painel'); T('render painel', $('#view').innerHTML.includes('Ocupação por rua'));
+  for (const t of ['planta', 'end', 'prod', 'mover', 'rel', 'etq', 'cfg']) { try { go(t); T('render ' + t, $('#view').innerHTML.length > 200); } catch (e) { T('render ' + t + ' ' + e.message, false); } }
+  S.cfg.site = 'LOJ'; UI.rua = 7; UI.mv2 = 'rua'; go('planta'); T('mapa loja rua 7 (base varejo)', $('#view').innerHTML.includes('BASE DE VAREJO'));
+  const pre = document.createElement('pre'); pre.id = 'selftest'; pre.textContent = out.join('\n'); document.body.appendChild(pre);
+  localStorage.removeItem(KEY);
+}
+
+/* ---------------- multiloja e nuvem (Google Planilhas via Apps Script) ---------------- */
+const SY = { busy: false, t: null, st: 'off', msg: '', last: '', pend: new Set(), pausa: false, again: false };
+const jl = L => JSON.stringify((L || []).map(l => [+l.pid, +l.q, l.val || '', l.lote || '', l.dt || '']));
+const jp = p => JSON.stringify([p.cod, p.ean || '', p.desc, p.un || '', p.cat || '', +p.min || 0]);
+const cleanLines = L => (L || []).map(l => ({ pid: +l.pid, q: +l.q, val: l.val || '', lote: l.lote || '', dt: l.dt || '' }));
+const prodFrom = p => ({ id: +p.id, cod: String(p.cod ?? ''), ean: String(p.ean ?? ''), desc: String(p.desc ?? ''), un: p.un || 'UN', cat: p.cat || '', min: +p.min || 0 });
+function syText() { return ({ off: 'Nuvem não configurada: os dados ficam só neste aparelho.', ok: 'Sincronizado' + (SY.last ? ' às ' + SY.last : '') + '.', pend: 'Alterações aguardando envio…', busy: 'Sincronizando…', err: 'Sem conexão com a nuvem (' + SY.msg + '). Os dados continuam salvos neste aparelho e serão enviados quando voltar.', pause: 'Sincronização pausada: ' + SY.msg })[SY.st] || ''; }
+function setSy(st, msg) {
+  SY.st = st; if (msg !== undefined) SY.msg = msg;
+  const d = $('#sdot'); if (d) { d.className = 'sdot ' + st; d.title = syText(); }
+  const s = $('#sy-status'); if (s) s.textContent = syText();
+}
+function scheduleSync() {
+  if (SELFTEST) return;
+  if (!S.cfg.hook) return setSy('off');
+  setSy(SY.pausa ? 'pause' : 'pend'); clearTimeout(SY.t); SY.t = setTimeout(() => syncNow(), 1500);
+}
+async function api(method, params, body) {
+  const u = S.cfg.hook, tk = S.cfg.token || ''; let r;
+  if (method === 'GET') r = await fetch(u + (u.includes('?') ? '&' : '?') + new URLSearchParams({ ...params, token: tk }).toString());
+  else r = await fetch(u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ ...body, token: tk }) });
+  let j; try { j = await r.json(); } catch (e) { throw new Error('resposta inválida: confira a URL e se a implantação está com acesso “Qualquer pessoa”'); }
+  if (!j.ok) throw new Error(j.erro || 'falha na nuvem'); return j;
+}
+const canRefresh = () => !$('#mod').classList.contains('on') && !$('#ov').classList.contains('on') && !/^(INPUT|SELECT|TEXTAREA)$/.test((document.activeElement || {}).tagName || '') && !['mover', 'cfg'].includes(UI.tab);
+
+async function syncNow(opt) {
+  opt = opt || {};
+  if (!S.cfg.hook || SELFTEST) { setSy('off'); return; }
+  if (opt.manual) SY.pausa = false;
+  if (SY.pausa && !opt.mode) return;
+  if (SY.busy) { SY.again = true; return; }
+  if (!navigator.onLine && !opt.manual) { setSy('err', 'sem internet'); return; }
+  SY.busy = true; setSy('busy'); let ch = 0;
+  try {
+    const Y = S.sync;
+    if (Y.url !== S.cfg.hook) { Y.url = S.cfg.hook; Y.prodOk = false; Y.lojas = {}; Y.base = { prod: {}, stock: {} }; Y.movRow = {}; }
+    const cur = S.cfg.loja, lojas = [cur, ...[...SY.pend].filter(x => x !== cur)]; SY.pend.clear();
+    for (const loja of lojas) { ch += await syncLoja(loja, loja === cur ? opt.mode : undefined); if (SY.pausa) break; }
+    if (!SY.pausa) { SY.last = new Date().toTimeString().slice(0, 5); setSy('ok'); }
+  } catch (e) { setSy('err', e.message || String(e)); }
+  finally {
+    SY.busy = false; persist();
+    if (SY.again) { SY.again = false; setTimeout(() => syncNow(), 300); }
+    if (ch && canRefresh()) render();
+  }
+}
+
+async function syncLoja(loja, mode) {
+  const Y = S.sync, LD = lojaData(S, loja);
+  const R = await api('GET', { action: 'pull', loja, movRow: mode === 'down' ? 0 : (Y.movRow[loja] || 0) });
+  if (mode === 'down') { fromCloud(R, LD, loja); Y.prodOk = true; Y.lojas[loja] = true; return 1; }
+  if (mode === 'up') forceUp(R, LD, loja);
+  else if (!Y.prodOk || !Y.lojas[loja]) {
+    const nLocal = Object.keys(LD.stock.DEP).length + Object.keys(LD.stock.LOJ).length + LD.mov.length;
+    if ((!Y.prodOk && S.prod.length && R.temProdutos) || (!Y.lojas[loja] && nLocal && R.temDadosLoja)) {
+      SY.pausa = true; setSy('pause', 'a planilha já tem dados e este aparelho também. Em Configurações escolha “Baixar da nuvem” ou “Enviar este aparelho”.');
+      if (confirm('A planilha (nuvem) já contém dados e este aparelho também.\n\nOK = usar os dados da nuvem (substitui os deste aparelho)\nCancelar = decidir depois em Configurações')) { SY.pausa = false; fromCloud(R, LD, loja); Y.prodOk = true; Y.lojas[loja] = true; return 1; }
+      return 0;
+    }
+  }
+  const ch = mode === 'up' ? 0 : mergePull(R, LD, loja);
+  Y.prodOk = true; Y.lojas[loja] = true;
+  await pushPending(LD, loja);
+  return ch;
+}
+
+function setBaseFromCloud(R, loja) {
+  const Y = S.sync; Y.base.prod = {}; R.prod.forEach(p => { Y.base.prod[p.id] = jp(p); });
+  for (const k of Object.keys(Y.base.stock)) if (k.startsWith(loja + '|')) delete Y.base.stock[k];
+  for (const sk of Object.keys(R.stock || {})) for (const c of Object.keys(R.stock[sk])) Y.base.stock[`${loja}|${sk}|${c}`] = jl(R.stock[sk][c]);
+  Y.movRow[loja] = R.movRow || 0;
+}
+function fromCloud(R, LD, loja) {
+  S.prod = R.prod.map(prodFrom);
+  LD.stock = { DEP: {}, LOJ: {} };
+  for (const sk of Object.keys(R.stock || {})) { LD.stock[sk] = LD.stock[sk] || {}; for (const c of Object.keys(R.stock[sk])) if (R.stock[sk][c].length) LD.stock[sk][c] = cleanLines(R.stock[sk][c]); }
+  LD.mov = (R.mov || []).map(m => ({ id: S.seq.mov++, uid: m.uid, sent: true, ts: m.ts, op: m.op, site: m.site, tipo: m.tipo, pid: m.pid, q: m.q, orig: m.orig, dest: m.dest, val: m.val, lote: m.lote, obs: m.obs }));
+  setBaseFromCloud(R, loja);
+}
+function forceUp(R, LD, loja) { setBaseFromCloud(R, loja); LD.mov.forEach(m => { m.sent = false; }); }
+
+function mergePull(R, LD, loja) {
+  const Y = S.sync; let ch = 0;
+  // produtos (cadastro único da rede)
+  const lp = new Map(S.prod.map(p => [p.id, p])), del = new Set((R.prodDel || []).map(Number));
+  for (const r of R.prod) {
+    const l = lp.get(r.id), b = Y.base.prod[r.id], jr = jp(r);
+    if (!l) { if (b === undefined && !del.has(r.id)) { S.prod.push(prodFrom(r)); Y.base.prod[r.id] = jr; ch++; } }
+    else if (b === undefined) { if (jp(l) === jr) Y.base.prod[r.id] = jr; }
+    else if (jp(l) === b) { if (jr !== b) { Object.assign(l, prodFrom(r)); ch++; } Y.base.prod[r.id] = jr; }
+  }
+  for (const id of del) { const l = lp.get(id), b = Y.base.prod[id]; if (l && b !== undefined && jp(l) === b) { S.prod = S.prod.filter(p => p.id !== id); ch++; } if (!l || (b !== undefined && jp(l) === b)) delete Y.base.prod[id]; }
+  // estoque por endereço (só sobrescreve o que não foi alterado neste aparelho)
+  const seen = new Set();
+  for (const sk of Object.keys(SITES)) {
+    const loc = LD.stock[sk], rem = (R.stock || {})[sk] || {};
+    for (const c of new Set([...Object.keys(loc), ...Object.keys(rem)])) {
+      const key = `${loja}|${sk}|${c}`; seen.add(key);
+      const L = jl(loc[c]), B = Y.base.stock[key] || '[]', Rj = jl(rem[c]);
+      if (L === B) { if (Rj !== L) { if (rem[c] && rem[c].length) loc[c] = cleanLines(rem[c]); else delete loc[c]; ch++; } if (Rj === '[]') delete Y.base.stock[key]; else Y.base.stock[key] = Rj; }
+      else if (L === Rj) { if (Rj === '[]') delete Y.base.stock[key]; else Y.base.stock[key] = Rj; }
+    }
+  }
+  for (const k of Object.keys(Y.base.stock)) if (k.startsWith(loja + '|') && !seen.has(k)) delete Y.base.stock[k];
+  // movimentações de outros aparelhos
+  const have = new Set(LD.mov.map(m => m.uid).filter(Boolean)); let add = 0;
+  for (const m of (R.mov || [])) if (!have.has(m.uid)) { LD.mov.push({ id: S.seq.mov++, uid: m.uid, sent: true, ts: m.ts, op: m.op, site: m.site, tipo: m.tipo, pid: m.pid, q: m.q, orig: m.orig, dest: m.dest, val: m.val, lote: m.lote, obs: m.obs }); add++; }
+  if (add) { LD.mov.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : a.id - b.id)); ch += add; }
+  Y.movRow[loja] = R.movRow || Y.movRow[loja] || 0;
+  return ch;
+}
+
+function collectPush(LD, loja) {
+  const Y = S.sync, o = { loja, dev: Y.dev, op: S.cfg.op || '', prod: [], prodDel: [], stock: [], mov: [] }, snap = { prod: {}, delProd: [], stock: {}, movs: [] };
+  for (const p of S.prod) { const j = jp(p); if (Y.base.prod[p.id] !== j) { o.prod.push(prodFrom(p)); snap.prod[p.id] = j; } }
+  const ids = new Set(S.prod.map(p => String(p.id)));
+  for (const k of Object.keys(Y.base.prod)) if (!ids.has(k)) { o.prodDel.push(+k); snap.delProd.push(k); }
+  for (const sk of Object.keys(SITES)) {
+    const loc = LD.stock[sk], keys = new Set(Object.keys(loc));
+    for (const k of Object.keys(Y.base.stock)) { const [lj, s2, c] = k.split('|'); if (lj === loja && s2 === sk) keys.add(c); }
+    for (const c of keys) { const key = `${loja}|${sk}|${c}`, L = jl(loc[c]), B = Y.base.stock[key] || '[]'; if (L !== B) { o.stock.push({ setor: sk, code: c, lines: cleanLines(loc[c]) }); snap.stock[key] = L; } }
+  }
+  for (const m of LD.mov) if (!m.sent) {
+    m.uid = m.uid || `${loja}-${Y.dev}-${m.id}-${String(m.ts || '').replace(/\D/g, '')}`;
+    const p = P(m.pid) || {};
+    o.mov.push({ uid: m.uid, ts: m.ts, setor: m.site, tipo: m.tipo, pid: m.pid, cod: p.cod || '', desc: p.desc || '', q: m.q, orig: m.orig || '', dest: m.dest || '', val: m.val || '', lote: m.lote || '', op: m.op || '', obs: m.obs || '' });
+    snap.movs.push(m);
+  }
+  return { o, snap };
+}
+async function pushPending(LD, loja) {
+  const { o, snap } = collectPush(LD, loja);
+  if (!o.prod.length && !o.prodDel.length && !o.stock.length && !o.mov.length) return;
+  o.action = 'push'; await api('POST', null, o);
+  const Y = S.sync;
+  for (const id of Object.keys(snap.prod)) Y.base.prod[id] = snap.prod[id];
+  for (const id of snap.delProd) delete Y.base.prod[id];
+  for (const k of Object.keys(snap.stock)) { if (snap.stock[k] === '[]') delete Y.base.stock[k]; else Y.base.stock[k] = snap.stock[k]; }
+  snap.movs.forEach(m => { m.sent = true; });
+  persist();
+}
+
+function switchLoja(id) {
+  if (!LOJAS.some(l => l.id === id) || id === S.cfg.loja) return;
+  const old = S.cfg.loja; lojaData(S, id); S.cfg.loja = id; rebuildAddr();
+  UI.plsite = ''; UI.fl = { q: '', rua: '', st: '' }; UI.lim = 80; UI.mv.orig = UI.mv.dest = ''; UI.mv.idx = null; UI.sel = ''; UI.rua = firstRua(); UI.lb.rua = UI.rua; UI.mv2 = UI.mv2 || 'planta';
+  persist(); closeDr(); closeMod();
+  if (S.cfg.hook) { SY.pend.add(old); SY.pausa = false; syncNow(); }
+  render(); window.scrollTo(0, 0);
+}
+function startSync() {
+  if (SELFTEST) return;
+  setSy(S.cfg.hook ? 'pend' : 'off');
+  setInterval(() => { if (document.visibilityState === 'visible' && S.cfg.hook) syncNow(); }, 45000);
+  window.addEventListener('online', () => syncNow());
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(); });
+  if (S.cfg.hook) syncNow();
+}
+
+/* ---------------- início ---------------- */
+(function init() {
+  const t = location.hash.replace('#/', ''); if (VIEWS[t]) UI.tab = t;
+  UI.rua = firstRua(); UI.lb.rua = UI.rua;
+  render();
+  startSync();
+  if (SELFTEST) selftest();
+})();
+</script>
+</body>
+</html>
